@@ -43,7 +43,7 @@ export default class App extends Component {
 
         console.log(accountObject);
         EthereumChatAccountModule.saveAccountAndLogin(
-          JSON.stringify(accountToSave),
+          JSON.stringify(accountObject),
           "password",
           JSON.stringify(nodeConfig),
           "[]"
