@@ -1,0 +1,1 @@
+geth -ws --shh --wsapi eth,net,rpc,web3,shh

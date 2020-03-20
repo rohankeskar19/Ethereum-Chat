@@ -1,6 +1,7 @@
 package com.ethereumchat;
 
-import android.os.Bundle;
+import
+        android.os.Bundle;
 import android.util.Log;
 
 import com.facebook.react.ReactActivity;
@@ -11,7 +12,6 @@ import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import statusgo.Statusgo;
 
 
 public class MainActivity extends ReactActivity {

@@ -1,51 +1,31 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { NativeModules } from "react-native";
-const nodeConfig = require("./node_config.json");
 
 var EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 
 export default class App extends Component {
   state = {
-    account: {}
+    keyPair: ""
   };
 
   componentDidMount() {
     EthereumChatAccountModule.createAccount(
       err => console.log(err),
-      account => {
-        account = JSON.parse(account);
-        const accountsArr = account.accounts;
-        const newAccount = accountsArr[0];
-
-        const accountObject = {
-          address: newAccount.address,
-          wallet: false,
-          chat: true,
-          type: "",
-          storage: "",
-          path: "",
-          "public-key": newAccount.pubkey,
-          name: "Rohan Keskar",
-          color: "#fff"
-        };
-        const accountToSave = [accountObject];
-
-        console.log(accountObject);
-        EthereumChatAccountModule.saveAccountAndLogin(
-          JSON.stringify(accountObject),
-          "password",
-          JSON.stringify(nodeConfig),
-          "[]"
-        );
+      keyPair => {
+        this.setState({
+          keyPair
+        });
+        console.log(keyPair);
       }
     );
   }
 
   render() {
+    const { keyPair } = this.state;
     return (
       <View style={styles.container}>
-        <Text>Ethereum Chat</Text>
+        <Text>Your account: {keyPair}</Text>
       </View>
     );
   }

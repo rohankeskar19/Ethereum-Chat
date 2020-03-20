@@ -9,10 +9,10 @@ public class ClientHolder  {
 
 
     public static WhisperClient getWhisperClient(){
-        if(whisperClient != null){
+        if(whisperClient == null){
             try{
-                whisperClient = Geth.newWhisperClient("ws://10.0.2.2");
-
+                whisperClient = Geth.newWhisperClient("ws://10.0.2.2:8546");
+                return whisperClient;
             }
             catch (Exception e){
                 e.printStackTrace();
