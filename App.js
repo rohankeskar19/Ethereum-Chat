@@ -1,19 +1,9 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { NativeModules } from "react-native";
+const nodeConfig = require("./node_config.json");
 
 var EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
-
-const nodeConfig = {
-  NetworkID: 1,
-  DataDir: "/tmp/status-go-data",
-  NodeKey: "123qwe123qwe123qwe123",
-  Rendezvous: true,
-  NoDiscovery: false,
-  ListenAddr: "0.0.0.0:30303",
-  AdvertiseAddr: "12.34.56.78",
-  RegisterTopics: ["whispermail"]
-};
 
 export default class App extends Component {
   state = {
@@ -55,8 +45,7 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Hello, My name is:</Text>
-        <Text>Rohan Keskar</Text>
+        <Text>Ethereum Chat</Text>
       </View>
     );
   }

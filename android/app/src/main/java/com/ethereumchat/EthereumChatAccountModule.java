@@ -39,13 +39,18 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void saveAccountAndLogin(String accountData,String password,String nodeConfig,String multiAccounts){
-        Log.d(TAG, "saveAccountAndLogin: called with " + accountData );
+        Log.d(TAG, "saveAccountAndLogin: called with " + accountData + "\n" + password + "\n" + nodeConfig + "\n" + multiAccounts );
+
+
+
         String result = Statusgo.saveAccountAndLogin(accountData, password, "{}", nodeConfig, multiAccounts);
         if (result.startsWith("{\"error\":\"\"")) {
             Log.d(TAG, "saveAccountAndLogin result12: " + result);
+
             String adminInfo = Statusgo.callPrivateRPC("admin_peers");
+
             Log.d(TAG, "Geth node started" + adminInfo);
-        } else {
+            } else {
             Log.e(TAG, "saveAccountAndLogin failed: " + result);
         }
     }
