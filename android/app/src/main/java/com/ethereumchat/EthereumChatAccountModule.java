@@ -4,12 +4,16 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.ethereumchat.Helpers.ClientHolder;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.uimanager.IllegalViewOperationException;
-import statusgo.Statusgo;
+
+import org.ethereum.geth.Context;
+import org.ethereum.geth.Geth;
+import org.ethereum.geth.WhisperClient;
 
 public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
@@ -28,31 +32,24 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void createAccount(Callback errorCallback,Callback successCallback){
         try{
-            String accountData = Statusgo.startOnboarding(1,12);
-            Log.d(TAG, "createAccount: " + accountData);
-            successCallback.invoke(accountData);
+            WhisperClient whisperClient = ClientHolder.getWhisperClient();
+
+            Context context = Geth.newContext();
+
+            String keyPair = whisperClient.newKeyPair(context);
+
+            successCallback.invoke(keyPair);
+
         }
-        catch (IllegalViewOperationException e){
-           errorCallback.invoke(e.getMessage());
+        catch (Exception e){
+            errorCallback.invoke(e.getMessage());
         }
+
     }
 
     @ReactMethod
-    public void saveAccountAndLogin(String accountData,String password,String nodeConfig,String multiAccounts){
-        Log.d(TAG, "saveAccountAndLogin: called with " + accountData + "\n" + password + "\n" + nodeConfig + "\n" + multiAccounts );
+    public void saveAccountAndLogin(){
 
-
-
-        String result = Statusgo.saveAccountAndLogin(accountData, password, "{}", nodeConfig, multiAccounts);
-        if (result.startsWith("{\"error\":\"\"")) {
-            Log.d(TAG, "saveAccountAndLogin result12: " + result);
-
-            String adminInfo = Statusgo.callPrivateRPC("admin_peers");
-
-            Log.d(TAG, "Geth node started" + adminInfo);
-            } else {
-            Log.e(TAG, "saveAccountAndLogin failed: " + result);
-        }
     }
 
 }
