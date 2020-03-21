@@ -30,7 +30,7 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void createAccount(Callback errorCallback,Callback successCallback){
+    public void createAccount(Callback errorCallback,Callback successCallback,String name,String passswordd){
         try{
             WhisperClient whisperClient = ClientHolder.getWhisperClient();
 
@@ -38,7 +38,12 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
             String keyPair = whisperClient.newKeyPair(context);
 
-            successCallback.invoke(keyPair);
+            //@TODO
+            // Save account in Database with name and password
+
+
+            successCallback.invoke("account - this will be a json object");
+
 
         }
         catch (Exception e){
@@ -49,6 +54,7 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void saveAccountAndLogin(){
+
 
     }
 
