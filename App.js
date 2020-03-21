@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { NativeModules } from "react-native";
+import Navigator from './routes/homeStack';
 
 var EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 
