@@ -1,16 +1,16 @@
 import React, { Component } from "react";
 import { View, Text } from "react-native";
 
-export class ChatList extends Component {
+export class Login extends Component {
   render() {
     return (
       <View>
         <View>
-          <Text>Chat List Screen</Text>
+          <Text>You need to login before using the app</Text>
         </View>
       </View>
     );
   }
 }
 
-export default ChatList;
+export default Login;

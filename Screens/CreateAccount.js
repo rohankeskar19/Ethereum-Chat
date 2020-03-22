@@ -4,9 +4,11 @@ import {
   Dimensions,
   NativeModules,
   Platform,
-  StyleSheet
+  StyleSheet,
+  Clipboard
 } from "react-native";
 import styled from "styled-components";
+import { IonIcons } from "@expo/vector-icons";
 
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
@@ -19,8 +21,18 @@ class CreateAccount extends Component {
     password: "",
     keyPair: "",
     errorOccured: false,
-    creatingAccount: false
+    creatingAccount: false,
+    keyPairCopied: false
   };
+
+  componentDidMount() {
+    EthereumChatAccountModule.checkAccountCreated(
+      err => {},
+      created => {
+        this.props.navigation.navigate("Login");
+      }
+    );
+  }
 
   handleCreateAccount = () => {
     const { name, password } = this.state;
@@ -36,18 +48,15 @@ class CreateAccount extends Component {
           creatingAccount: true
         },
         () => {
-          EthereumChatAccountModule.createKeyPair(
-            err => {
+          EthereumChatAccountModule.createAccount(
+            name.toString(),
+            password.toString(),
+            err => console.log(err),
+            key => {
               this.setState({
-                errorOccured: true
-              });
-            },
-            keyPair => {
-              this.setState({
-                keyPair,
+                keyPair: key,
                 creatingAccount: false
               });
-              console.log(this.state);
             }
           );
         }
@@ -55,30 +64,82 @@ class CreateAccount extends Component {
     }
   };
 
+  copyToClipboard = () => {
+    const { keyPair } = this.state;
+    this.setState(
+      {
+        keyPairCopied: true
+      },
+      () => {
+        Clipboard.setString(keyPair);
+      }
+    );
+  };
+
+  navigateToChatList = () => {
+    this.props.navigation.navigate("ChatList");
+  };
+
   render() {
-    const { errorOccured } = this.state;
+    const {
+      errorOccured,
+      keyPair,
+      creatingAccount,
+      keyPairCopied
+    } = this.state;
     return (
       <View>
         <Container>
-          <Header>Create your free account</Header>
-          <FormContainer>
-            <Input
-              placeholder="Enter your name"
-              onChangeText={name => this.setState({ name: name })}
-              style={errorOccured == true ? styles.errorOutline : null}
-            />
-            <Input
-              placeholder="Enter your password"
-              onChangeText={password => this.setState({ password: password })}
-              secureTextEntry={true}
-              style={errorOccured == true ? styles.errorOutline : null}
-            />
-            <CreateAccountButton>
-              <ButtonText onPress={this.handleCreateAccount}>
-                Create account
-              </ButtonText>
-            </CreateAccountButton>
-          </FormContainer>
+          {keyPair == "" ? (
+            <View>
+              <Header>Create your free account</Header>
+              <FormContainer>
+                <Input
+                  placeholder="Enter your name"
+                  onChangeText={name => this.setState({ name: name })}
+                  style={errorOccured == true ? styles.errorOutline : null}
+                />
+                <Input
+                  placeholder="Enter your password"
+                  onChangeText={password =>
+                    this.setState({ password: password })
+                  }
+                  secureTextEntry={true}
+                  style={errorOccured == true ? styles.errorOutline : null}
+                />
+                <CreateAccountButton>
+                  <ButtonText onPress={this.handleCreateAccount}>
+                    Create account
+                  </ButtonText>
+                </CreateAccountButton>
+              </FormContainer>
+            </View>
+          ) : (
+            <Container
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignContent: "space-between",
+                padding: 25
+              }}
+            >
+              <KeyHeader>
+                This is your account key, Store is securely somewhere you won't
+                be able to recover it later.
+              </KeyHeader>
+              <KeyText>{keyPair}</KeyText>
+              <CopyClipboardButton onPress={this.copyToClipboard}>
+                <CopyText>Copy</CopyText>
+              </CopyClipboardButton>
+              {keyPairCopied == true ? (
+                <TakeMeToAppButton onPress={this.navigateToChatList}>
+                  <TakeMeToAppText>Take me to the app</TakeMeToAppText>
+                </TakeMeToAppButton>
+              ) : (
+                <View></View>
+              )}
+            </Container>
+          )}
         </Container>
       </View>
     );
@@ -150,6 +211,50 @@ const CreateAccountButton = styled.TouchableOpacity`
 const ButtonText = styled.Text`
   color: #fff;
   font-size: 20px;
+`;
+
+const KeyHeader = styled.Text`
+  color: #000;
+  font-size: 20px;
+`;
+
+const KeyText = styled.Text`
+  color: #000;
+  font-size: 35px;
+  margin-top: 80px;
+  height: 30%;
+`;
+
+const CopyClipboardButton = styled.TouchableOpacity`
+  width: 100%;
+  height: 55px;
+  margin-top: 30px;
+
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  shadow-color: #000;
+  shadow-opacity: 0.4;
+  shadow-offset: 0px 20px;
+`;
+
+const CopyText = styled.Text`
+  color: #fff;
+  font-size: 20px;
+`;
+
+const TakeMeToAppButton = styled.TouchableOpacity`
+  width: 100%;
+  height: 55px;
+  margin-top: 55px;
+`;
+
+const TakeMeToAppText = styled.Text`
+  color: #000;
+  font-size: 22px;
+  text-align: center;
 `;
 
 export default CreateAccount;

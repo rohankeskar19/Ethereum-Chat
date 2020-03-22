@@ -6,6 +6,7 @@ import ChatList from "../Screens/ChatList";
 import Chat from "../Screens/Chat";
 import QrScan from "../Screens/QrScan";
 import QrShow from "../Screens/QrShow";
+import Login from "../Screens/Login";
 
 const screens = {
   CreateAccount: {
@@ -22,6 +23,9 @@ const screens = {
   },
   QrShow: {
     screen: QrShow
+  },
+  Login: {
+    screen: Login
   }
 };
 
