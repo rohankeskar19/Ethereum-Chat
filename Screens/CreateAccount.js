@@ -124,8 +124,8 @@ class CreateAccount extends Component {
               }}
             >
               <KeyHeader>
-                This is your account key, Store is securely somewhere you won't
-                be able to recover it later.
+                This is your account key, Please store is securely somewhere,
+                You won't be able to recover it later.
               </KeyHeader>
               <KeyText>{keyPair}</KeyText>
               <CopyClipboardButton onPress={this.copyToClipboard}>

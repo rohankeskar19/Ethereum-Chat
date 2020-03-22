@@ -1,1 +1,3 @@
-geth -ws --shh --wsapi eth,net,rpc,web3,shh
+geth -ws --shh --wsapi eth,net,web3,shh
+
+build app tutorial link : https://dev.to/shubhkirtisharma/building-serverless-or-debug-apk-for-react-native-apps-356m
