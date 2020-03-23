@@ -7,6 +7,7 @@ import Chat from "../Screens/Chat";
 import QrScan from "../Screens/QrScan";
 import QrShow from "../Screens/QrShow";
 import Login from "../Screens/Login";
+import Settings from "../Screens/Settings";
 
 const screens = {
   CreateAccount: {
@@ -26,6 +27,9 @@ const screens = {
   },
   Login: {
     screen: Login
+  },
+  Settings: {
+    screen: Settings
   }
 };
 

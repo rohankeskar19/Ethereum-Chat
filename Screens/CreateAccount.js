@@ -5,10 +5,12 @@ import {
   NativeModules,
   Platform,
   StyleSheet,
-  Clipboard
+  Clipboard,
+  Animated,
+  TouchableOpacity,
+  Text,
+  TextInput
 } from "react-native";
-import styled from "styled-components";
-import { IonIcons } from "@expo/vector-icons";
 
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
@@ -22,14 +24,15 @@ class CreateAccount extends Component {
     keyPair: "",
     errorOccured: false,
     creatingAccount: false,
-    keyPairCopied: false
+    keyPairCopied: false,
+    progressXPos: new Animated.Value(0)
   };
 
   componentDidMount() {
     EthereumChatAccountModule.checkAccountCreated(
       err => {},
       created => {
-        this.props.navigation.navigate("Login");
+        this.props.navigation.navigate("ChatList");
       }
     );
   }
@@ -43,6 +46,18 @@ class CreateAccount extends Component {
       });
     } else {
       console.log("Creating account", this.state);
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(this.state.progressXPos, {
+            toValue: 241,
+            duration: 400
+          }),
+          Animated.timing(this.state.progressXPos, {
+            toValue: 0,
+            duration: 400
+          })
+        ])
+      ).start();
       this.setState(
         {
           creatingAccount: true
@@ -87,60 +102,90 @@ class CreateAccount extends Component {
       creatingAccount,
       keyPairCopied
     } = this.state;
+    const animtedStyle = {
+      transform: [{ translateX: this.state.progressXPos }]
+    };
+
     return (
-      <View>
-        <Container>
-          {keyPair == "" ? (
-            <View>
-              <Header>Create your free account</Header>
-              <FormContainer>
-                <Input
-                  placeholder="Enter your name"
-                  onChangeText={name => this.setState({ name: name })}
-                  style={errorOccured == true ? styles.errorOutline : null}
-                />
-                <Input
-                  placeholder="Enter your password"
-                  onChangeText={password =>
-                    this.setState({ password: password })
-                  }
-                  secureTextEntry={true}
-                  style={errorOccured == true ? styles.errorOutline : null}
-                />
-                <CreateAccountButton>
-                  <ButtonText onPress={this.handleCreateAccount}>
-                    Create account
-                  </ButtonText>
-                </CreateAccountButton>
-              </FormContainer>
-            </View>
-          ) : (
-            <Container
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignContent: "space-between",
-                padding: 25
-              }}
-            >
-              <KeyHeader>
-                This is your account key, Please store is securely somewhere,
-                You won't be able to recover it later.
-              </KeyHeader>
-              <KeyText>{keyPair}</KeyText>
-              <CopyClipboardButton onPress={this.copyToClipboard}>
-                <CopyText>Copy</CopyText>
-              </CopyClipboardButton>
-              {keyPairCopied == true ? (
-                <TakeMeToAppButton onPress={this.navigateToChatList}>
-                  <TakeMeToAppText>Take me to the app</TakeMeToAppText>
-                </TakeMeToAppButton>
-              ) : (
-                <View></View>
-              )}
-            </Container>
-          )}
-        </Container>
+      <View style={styles.container}>
+        {creatingAccount == true ? (
+          <View style={styles.progressBar}>
+            <Animated.View
+              style={[styles.progress, animtedStyle]}
+            ></Animated.View>
+          </View>
+        ) : (
+          <View style={styles.Container}>
+            {keyPair == "" ? (
+              <View>
+                <Text style={styles.Header}>Create your free account</Text>
+                <View style={styles.FormContainer}>
+                  <TextInput
+                    placeholder="Enter your name"
+                    onChangeText={name => this.setState({ name: name })}
+                    style={[
+                      errorOccured == true ? styles.errorOutline : null,
+                      styles.Input
+                    ]}
+                  />
+                  <TextInput
+                    placeholder="Enter your password"
+                    onChangeText={password =>
+                      this.setState({ password: password })
+                    }
+                    secureTextEntry={true}
+                    style={[
+                      errorOccured == true ? styles.errorOutline : null,
+                      styles.Input
+                    ]}
+                  />
+                  <TouchableOpacity
+                    style={styles.CreateAccountButton}
+                    onPress={this.handleCreateAccount}
+                  >
+                    <Text style={styles.ButtonText}>Create account</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <View
+                style={[
+                  {
+                    display: "flex",
+                    flexDirection: "column",
+                    alignContent: "space-between",
+                    padding: 25
+                  },
+                  styles.Container
+                ]}
+              >
+                <Text style={styles.KeyHeader}>
+                  This is your account key, Please store it securely somewhere,
+                  You won't be able to recover it later.
+                </Text>
+                <Text style={styles.KeyText}>{keyPair}</Text>
+                <TouchableOpacity
+                  style={styles.CopyToClipboardButton}
+                  onPress={this.copyToClipboard}
+                >
+                  <Text style={styles.ButtonText}>Copy</Text>
+                </TouchableOpacity>
+                {keyPairCopied == true ? (
+                  <TouchableOpacity
+                    onPress={this.navigateToChatList}
+                    style={styles.TakeMeToAppButton}
+                  >
+                    <Text style={styles.TakeMeToAppText}>
+                      Take me to the app
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <View></View>
+                )}
+              </View>
+            )}
+          </View>
+        )}
       </View>
     );
   }
@@ -152,109 +197,118 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 10
+  },
+  progressBar: {
+    width: "60%",
+    height: 5,
+    backgroundColor: "#bababa",
+    borderRadius: 5
+  },
+  progress: {
+    width: 5,
+    height: 5,
+    backgroundColor: "#000",
+    borderRadius: 5
+  },
+
+  container: {
+    display: "flex",
+    flex: 1,
+    flexDirection: "column",
+    alignContent: "center",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  Container: {
+    display: "flex",
+    flex: 1,
+    flexDirection: "column",
+    position: "absolute",
+    paddingTop: 30,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: width,
+    height: height
+  },
+  FormContainer: {
+    width: "100%",
+    height: "70%",
+    padding: 20
+  },
+  Header: {
+    color: "#000",
+    fontSize: 40,
+    padding: 10,
+    marginLeft: 10
+  },
+  Input: {
+    width: "100%",
+    height: 50,
+    color: "#383d3a",
+    fontSize: 20,
+    padding: 10,
+    marginTop: 10,
+    marginBottom: 15
+  },
+  CreateAccountButton: {
+    width: "100%",
+    height: 55,
+    marginTop: 30,
+    backgroundColor: "#000",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.4,
+    textShadowOffset: {
+      width: 0,
+      height: 20
+    }
+  },
+  ButtonText: {
+    color: "#fff",
+    fontSize: 20
+  },
+  TakeMeToAppButton: {
+    width: "100%",
+    height: 55,
+    marginTop: 55
+  },
+  TakeMeToAppText: {
+    color: "#000",
+    fontSize: 22,
+    textAlign: "center"
+  },
+  KeyHeader: {
+    color: "#000",
+    fontSize: 20
+  },
+  KeyText: {
+    color: "#000",
+    fontSize: 35,
+    marginTop: 80,
+    height: "30%"
+  },
+  CopyText: {
+    color: "#fff",
+    fontSize: 20
+  },
+  CopyToClipboardButton: {
+    width: "100%",
+    height: 55,
+    marginTop: 30,
+    backgroundColor: "#000",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.4,
+    textShadowOffset: { width: 0, height: 20 }
   }
 });
-
-const Container = styled.View`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: ${width}px;
-  height: ${height}px;
-  position: absolute;
-  padding-top: 30px;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-`;
-
-const FormContainer = styled.View`
-  width: 100%;
-  height: 70%;
-  padding: 20px;
-`;
-
-const Header = styled.Text`
-  color: #000;
-  font-size: 40px;
-  padding: 10px;
-  font-weight: 400;
-  margin-left: 10px;
-`;
-
-const Input = styled.TextInput`
-  width: 100%;
-  height: 70px;
-  color: #383d3a;
-  font-size: 20px;
-  padding: 10px;
-
-  margin-top: 10px;
-  margin-bottom: 15px;
-`;
-
-const CreateAccountButton = styled.TouchableOpacity`
-  width: 100%;
-  height: 55px;
-  margin-top: 30px;
-  background: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 5px;
-  shadow-color: #000;
-  shadow-opacity: 0.4;
-  shadow-offset: 0px 20px;
-`;
-
-const ButtonText = styled.Text`
-  color: #fff;
-  font-size: 20px;
-`;
-
-const KeyHeader = styled.Text`
-  color: #000;
-  font-size: 20px;
-`;
-
-const KeyText = styled.Text`
-  color: #000;
-  font-size: 35px;
-  margin-top: 80px;
-  height: 30%;
-`;
-
-const CopyClipboardButton = styled.TouchableOpacity`
-  width: 100%;
-  height: 55px;
-  margin-top: 30px;
-
-  background: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 5px;
-  shadow-color: #000;
-  shadow-opacity: 0.4;
-  shadow-offset: 0px 20px;
-`;
-
-const CopyText = styled.Text`
-  color: #fff;
-  font-size: 20px;
-`;
-
-const TakeMeToAppButton = styled.TouchableOpacity`
-  width: 100%;
-  height: 55px;
-  margin-top: 55px;
-`;
-
-const TakeMeToAppText = styled.Text`
-  color: #000;
-  font-size: 22px;
-  text-align: center;
-`;
 
 export default CreateAccount;

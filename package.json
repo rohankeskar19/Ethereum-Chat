@@ -13,15 +13,17 @@
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "~0.61.4",
+    "react-native-camera": "^3.21.0",
     "react-native-gesture-handler": "^1.5.6",
+    "react-native-qrcode-generator": "^1.1.0",
     "react-native-reanimated": "^1.4.0",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.0.0-alpha.12",
     "react-native-unimodules": "~0.7.0",
     "react-native-web": "~0.11.7",
+    "react-native-webview": "^7.0.5",
     "react-navigation": "^4.3.2",
-    "react-navigation-stack": "^2.3.4",
-    "styled-components": "^5.0.1"
+    "react-navigation-stack": "^2.3.4"
   },
   "devDependencies": {
     "@babel/core": "~7.6.0",
@@ -33,5 +35,10 @@
   "jest": {
     "preset": "react-native"
   },
-  "private": true
+  "private": true,
+  "rnpm": {
+    "assets": [
+      "./assets/fonts/nunito"
+    ]
+  }
 }
