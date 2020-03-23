@@ -3,7 +3,6 @@ import {
   View,
   Dimensions,
   NativeModules,
-  Platform,
   StyleSheet,
   Clipboard,
   Animated,
@@ -11,6 +10,7 @@ import {
   Text,
   TextInput
 } from "react-native";
+import { StackActions, NavigationActions } from "react-navigation";
 
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
@@ -32,7 +32,14 @@ class CreateAccount extends Component {
     EthereumChatAccountModule.checkAccountCreated(
       err => {},
       created => {
-        this.props.navigation.navigate("ChatList");
+        this.props.navigation.dispatch({
+          ...StackActions.reset({
+            index: 0,
+            actions: [
+              NavigationActions.navigate({ routeName: "SelectProfileImage" })
+            ]
+          })
+        });
       }
     );
   }
@@ -92,7 +99,7 @@ class CreateAccount extends Component {
   };
 
   navigateToChatList = () => {
-    this.props.navigation.navigate("ChatList");
+    this.props.navigation.navigate("SelectProfileImage");
   };
 
   render() {

@@ -8,6 +8,7 @@ import QrScan from "../Screens/QrScan";
 import QrShow from "../Screens/QrShow";
 import Login from "../Screens/Login";
 import Settings from "../Screens/Settings";
+import SelectProfileImage from "../Screens/SelectProfileImage";
 
 const screens = {
   CreateAccount: {
@@ -30,6 +31,9 @@ const screens = {
   },
   Settings: {
     screen: Settings
+  },
+  SelectProfileImage: {
+    screen: SelectProfileImage
   }
 };
 
