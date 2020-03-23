@@ -31,8 +31,9 @@ public class ChatDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        final String SQLITE_CREATE_CONVERSATIONS_TABLE = "CREATE TABLE " + ConversationEntry.TABLE_NAME + " (" + ConversationEntry.COLUMN_NAME + " VARCHAR(40) NOT NULL, " +  ConversationEntry.COLUMN_PUBLIC_KEY + " VARCHAR(500) NOT NULL, " +  ConversationEntry.COLUMN_PROFILE_IN_STRING + " VARCHAR(20) NOT NULL, " + ConversationEntry.COLUMN_LAST_MESSAGE + " VARCHAR(65535) NOT NULL, " + ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP + " VARCHAR(25) NOT NULL, " + ConversationEntry.COLUMN_READ + " VARCHAR(10) NOT NULL);";
+        final String SQLITE_CREATE_CONVERSATIONS_TABLE = "CREATE TABLE " + ConversationEntry.TABLE_NAME + " (" + ConversationEntry.COLUMN_NAME + " VARCHAR(40) NOT NULL, " +  ConversationEntry.COLUMN_PUBLIC_KEY + " VARCHAR(500) NOT NULL, " +  ConversationEntry.COLUMN_PROFILE_IN_STRING + " VARCHAR(500) NOT NULL, " + ConversationEntry.COLUMN_LAST_MESSAGE + " VARCHAR(65535) NOT NULL, " + ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP + " VARCHAR(25) NOT NULL, " + ConversationEntry.COLUMN_READ + " VARCHAR(10) NOT NULL);";
         final String SQLITE_CREATE_MESSAGES_TABLE = "CREATE TABLE " + MessageEntry.TABLE_NAME + " ("  + MessageEntry.COLUMN_NAME + " VARCHAR(30) NOT NULL, " + MessageEntry.COLUMN_TIMESTAMP + " VARCHAR(25) NOT NULL, " + MessageEntry.COLUMN_IS_IMAGE + " VARCHAR(20) NOT NULL, " + MessageEntry.COLUMN_MESSAGE + " VARCHAR(65535) NOT NULL, " + MessageEntry.COLUMN_FROM_PUBLIC_KEY + " VARCHAR(500) NOT NULL, "  + MessageEntry.COLUMN_TO_PUBLIC_KEY + " VARCHAR(30) NOT NULL);";
+        final String SQLITE_CREATE_CONTACTS_TABLE = "CREATE TABLE " + ContactEntry.TABLE_NAME + " (" + ContactEntry.COLUMN_NAME + " VARCHAR(40) NOT NULL, " +  ContactEntry.COLUMN_PUBLIC_KEY + " VARCHAR(500) NOT NULL, " +  ContactEntry.COLUMN_PROFILE_IN_STRING + " VARCHAR(500) NOT NULL);";
         //final String SQLITE_CREATE_ACCOUNT_TABLE = "CREATE TABLE " + AccountEntry.TABLE_NAME + " ("  + AccountEntry.COLUMN_NAME + " VARCHAR(30) NOT NULL, " + AccountEntry.COLUMN_PUBLIC_KEY + " VARCHAR(25) NOT NULL, " + AccountEntry.COLUMN_PRIVATE_KEY + " VARCHAR(20) NOT NULL, " + AccountEntry.COLUMN_PASSWORD + " VARCHAR(20) NOT NULL, " + AccountEntry.COLUMN_KEYPAIR + " VARCHAR(65535) NOT NULL);";
         db.execSQL(SQLITE_CREATE_CONVERSATIONS_TABLE);
         db.execSQL(SQLITE_CREATE_MESSAGES_TABLE);
@@ -43,6 +44,7 @@ public class ChatDBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + ConversationEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MessageEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ContactEntry.TABLE_NAME);
         //db.execSQL("DROP TABLE IF EXISTS " + AccountEntry.TABLE_NAME);
 
         onCreate(db);
@@ -213,6 +215,8 @@ public class ChatDBHelper extends SQLiteOpenHelper {
 
         db.execSQL("DELETE FROM " + ConversationEntry.TABLE_NAME);
         db.execSQL("DELETE FROM " + MessageEntry.TABLE_NAME);
+        db.execSQL("DELETE FROM " + ContactEntry.TABLE_NAME);
+
         //db.execSQL("DELETE FROM " + AccountEntry.TABLE_NAME);
     }
 
