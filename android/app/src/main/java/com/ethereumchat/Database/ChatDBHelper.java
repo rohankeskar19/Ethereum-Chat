@@ -68,6 +68,7 @@ public class ChatDBHelper extends SQLiteOpenHelper {
 
     }
 
+
     public Conversation checkIfConversationExists(String public_key){
         Log.d(TAG, "checkIfConversationExists: Called");
         SQLiteDatabase db = this.getReadableDatabase();
@@ -208,6 +209,61 @@ public class ChatDBHelper extends SQLiteOpenHelper {
 
         return messageList;
     }
+
+
+    public void addContact(Contact contact){
+        SQLiteDatabase db = this.getWritableDatabase();
+        Log.d(TAG, "addContact: " + contact.toString());
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ContactEntry.COLUMN_NAME,contact.getName());
+        contentValues.put(ContactEntry.COLUMN_PUBLIC_KEY,contact.getPublicKey());
+        contentValues.put(ContactEntry.COLUMN_PROFILE_IN_STRING, contact.getProfileInString());
+
+        db.insert(ContactEntry.TABLE_NAME,null,contentValues);
+
+        db.close();
+
+    }
+
+    public List<Contact> getAllContact(){
+        Log.d(TAG, "getAllContact: Called");
+        List<Contact> contactList = new ArrayList<>();
+
+        String query = "SELECT * FROM " + ContactEntry.TABLE_NAME + " ORDER BY " + ContactEntry.COLUMN_NAME + " ASC";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.rawQuery(query,null);
+
+        if (cursor.moveToFirst()){
+            do{
+                Log.d(TAG, "checkIfContactExists: " + cursor.getString(0));
+                Log.d(TAG, "checkIfContactExists: " + cursor.getString(1));
+                Log.d(TAG, "checkIfContactExists: " + cursor.getString(2));
+
+
+                Contact contact = new Contact(cursor.getString(0),cursor.getString(1),cursor.getString(2));
+
+                contactList.add(contact);
+            }
+            while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return contactList;
+    }
+
+    public Contact getContact(String publicKey){
+        Log.d(TAG, "getContact: Called");
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT * FROM " + ContactEntry.TABLE_NAME + " WHERE " + ContactEntry.COLUMN_PUBLIC_KEY + "= '" + publicKey + "'";
+        Cursor cursor = db.rawQuery(query,null);
+        Contact contact = new Contact(cursor.getString(0),cursor.getString(1),cursor.getString(2));
+        cursor.close();
+        return contact;
+    }
+
 
     public void dropTables(){
         Log.d(TAG, "dropTables: Called");
