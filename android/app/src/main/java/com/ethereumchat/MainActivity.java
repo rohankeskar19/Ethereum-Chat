@@ -14,7 +14,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-
 public class MainActivity extends ReactActivity {
 
     /**
@@ -37,7 +36,6 @@ public class MainActivity extends ReactActivity {
             }
         };
     }
-
 
 
 }

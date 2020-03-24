@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 import ImagePicker from "react-native-image-picker";
-const defaultImage = require("../assets/default_profile.jpg");
+// const RNFS = require("react-native-fs");
 
 const options = {
   storageOptions: {
@@ -12,15 +12,19 @@ const options = {
 
 class SelectProfileImage extends Component {
   handleSelectImageClick = () => {
-    ImagePicker.launchImageLibrary(options, response => {});
+    ImagePicker.launchImageLibrary(options, response => {
+      console.log(response);
+    });
   };
 
   handleOpenCameraClick = () => {
-    ImagePicker.launchCamera(options, response => {});
+    ImagePicker.launchCamera(options, response => {
+      console.log(response);
+    });
   };
 
   selectDefault = () => {
-    console.log(defaultImage);
+    const image = "default_image";
   };
 
   render() {
@@ -36,7 +40,7 @@ class SelectProfileImage extends Component {
           />
           <View style={styles.ButtonsContainer}>
             <TouchableOpacity
-              style={styles.CircularButton}
+              style={styles.CircularButtonLeft}
               onPress={this.handleSelectImageClick}
             >
               <Image
@@ -44,7 +48,7 @@ class SelectProfileImage extends Component {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.CircularButton}
+              style={styles.CircularButtonRight}
               onPress={this.handleOpenCameraClick}
             >
               <Image source={require("../assets/icons/camera.png")} />
@@ -74,9 +78,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  CircularButton: {
+  CircularButtonLeft: {
     backgroundColor: "#000",
-    borderRadius: 8,
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+    width: "50%",
+    height: 80,
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: "17%",
+    paddingRight: "25%"
+  },
+  CircularButtonRight: {
+    backgroundColor: "#000",
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
     width: "50%",
     height: 80,
     paddingTop: 15,
