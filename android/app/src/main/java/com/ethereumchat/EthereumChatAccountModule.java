@@ -90,6 +90,34 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
     }
 
+    @ReactMethod
+    public void saveImage(String imageString,Callback err,Callback success){
+        try{
+            SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("profile_image",imageString);
+            editor.commit();
+            success.invoke("saved_image");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            err.invoke("error_occurred");
+        }
+
+    }
+
+    @ReactMethod
+    public void checkImageSet(Callback err,Callback success){
+        SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
+        String image = sharedPreferences.getString("profile_image","not_set");
+
+        if(image.equals("not_set")){
+            err.invoke("image_not_set");
+        }
+        else{
+            success.invoke("image_set");
+        }
+    }
 
 
 }

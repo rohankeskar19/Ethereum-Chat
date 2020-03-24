@@ -44,7 +44,7 @@ public class MainApplication extends Application implements ReactApplication {
 
       List<ReactPackage> packages = new PackageList(this).getPackages();
       packages.add(new EthereumChatPackage());
-      
+
       packages1 = packages;
 
 //      packages.add(new ModuleRegistryAdapter(mModuleRegistryProvider));

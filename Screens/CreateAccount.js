@@ -98,7 +98,7 @@ class CreateAccount extends Component {
     );
   };
 
-  navigateToChatList = () => {
+  navigateToSelectProfileImage = () => {
     this.props.navigation.navigate("SelectProfileImage");
   };
 
@@ -179,7 +179,7 @@ class CreateAccount extends Component {
                 </TouchableOpacity>
                 {keyPairCopied == true ? (
                   <TouchableOpacity
-                    onPress={this.navigateToChatList}
+                    onPress={this.navigateToSelectProfileImage}
                     style={styles.TakeMeToAppButton}
                   >
                     <Text style={styles.TakeMeToAppText}>

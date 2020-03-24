@@ -1,7 +1,16 @@
 import React, { Component } from "react";
-import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  NativeModules
+} from "react-native";
 import ImagePicker from "react-native-image-picker";
-// const RNFS = require("react-native-fs");
+import { StackActions, NavigationActions } from "react-navigation";
+
+const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 
 const options = {
   storageOptions: {
@@ -11,20 +20,74 @@ const options = {
 };
 
 class SelectProfileImage extends Component {
+  componentDidMount() {
+    EthereumChatAccountModule.checkImageSet(
+      err => {},
+      success => {
+        this.props.navigation.dispatch({
+          ...StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: "ChatList" })]
+          })
+        });
+      }
+    );
+  }
+
   handleSelectImageClick = () => {
     ImagePicker.launchImageLibrary(options, response => {
-      console.log(response);
+      if (response.didCancel || response.error || response.customButton) {
+      } else {
+        EthereumChatAccountModule.saveImage(
+          response.data.toString(),
+          err => {},
+          success => {
+            this.props.navigation.dispatch({
+              ...StackActions.reset({
+                index: 0,
+                actions: [NavigationActions.navigate({ routeName: "ChatList" })]
+              })
+            });
+          }
+        );
+      }
     });
   };
 
   handleOpenCameraClick = () => {
     ImagePicker.launchCamera(options, response => {
-      console.log(response);
+      if (response.didCancel || response.error || response.customButton) {
+      } else {
+        EthereumChatAccountModule.saveImage(
+          response.data.toString(),
+          err => {},
+          success => {
+            this.props.navigation.dispatch({
+              ...StackActions.reset({
+                index: 0,
+                actions: [NavigationActions.navigate({ routeName: "ChatList" })]
+              })
+            });
+          }
+        );
+      }
     });
   };
 
   selectDefault = () => {
     const image = "default_image";
+    EthereumChatAccountModule.saveImage(
+      image,
+      err => {},
+      success => {
+        this.props.navigation.dispatch({
+          ...StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: "ChatList" })]
+          })
+        });
+      }
+    );
   };
 
   render() {
