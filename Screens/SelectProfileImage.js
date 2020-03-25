@@ -1,7 +1,16 @@
 import React, { Component } from "react";
-import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Image,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  NativeModules
+} from "react-native";
 import ImagePicker from "react-native-image-picker";
-const defaultImage = require("../assets/default_profile.jpg");
+import { StackActions, NavigationActions } from "react-navigation";
+
+const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 
 const options = {
   storageOptions: {
@@ -11,17 +20,74 @@ const options = {
 };
 
 class SelectProfileImage extends Component {
+  componentDidMount() {
+    EthereumChatAccountModule.checkImageSet(
+      err => {},
+      success => {
+        this.props.navigation.dispatch({
+          ...StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: "ChatList" })]
+          })
+        });
+      }
+    );
+  }
+
   handleSelectImageClick = () => {
-    ImagePicker.launchImageLibrary(options, response => {});
+    ImagePicker.launchImageLibrary(options, response => {
+      if (response.didCancel || response.error || response.customButton) {
+      } else {
+        EthereumChatAccountModule.saveImage(
+          response.data.toString(),
+          err => {},
+          success => {
+            this.props.navigation.dispatch({
+              ...StackActions.reset({
+                index: 0,
+                actions: [NavigationActions.navigate({ routeName: "ChatList" })]
+              })
+            });
+          }
+        );
+      }
+    });
   };
 
   handleOpenCameraClick = () => {
-    ImagePicker.launchCamera(options, response => {});
+    ImagePicker.launchCamera(options, response => {
+      if (response.didCancel || response.error || response.customButton) {
+      } else {
+        EthereumChatAccountModule.saveImage(
+          response.data.toString(),
+          err => {},
+          success => {
+            this.props.navigation.dispatch({
+              ...StackActions.reset({
+                index: 0,
+                actions: [NavigationActions.navigate({ routeName: "ChatList" })]
+              })
+            });
+          }
+        );
+      }
+    });
   };
 
   selectDefault = () => {
-    console.log(defaultImage);
-    this.props.navigation.navigate("ChatList");
+    const image = "default_image";
+    EthereumChatAccountModule.saveImage(
+      image,
+      err => {},
+      success => {
+        this.props.navigation.dispatch({
+          ...StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: "ChatList" })]
+          })
+        });
+      }
+    );
   };
 
   render() {
@@ -37,7 +103,7 @@ class SelectProfileImage extends Component {
           />
           <View style={styles.ButtonsContainer}>
             <TouchableOpacity
-              style={styles.CircularButton}
+              style={styles.CircularButtonLeft}
               onPress={this.handleSelectImageClick}
             >
               <Image
@@ -45,7 +111,7 @@ class SelectProfileImage extends Component {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.CircularButton}
+              style={styles.CircularButtonRight}
               onPress={this.handleOpenCameraClick}
             >
               <Image source={require("../assets/icons/camera.png")} />
@@ -75,9 +141,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  CircularButton: {
+  CircularButtonLeft: {
     backgroundColor: "#000",
-    borderRadius: 8,
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+    width: "50%",
+    height: 80,
+    paddingTop: 15,
+    paddingBottom: 15,
+    paddingLeft: "17%",
+    paddingRight: "25%"
+  },
+  CircularButtonRight: {
+    backgroundColor: "#000",
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
     width: "50%",
     height: 80,
     paddingTop: 15,
