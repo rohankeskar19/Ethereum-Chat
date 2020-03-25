@@ -21,6 +21,7 @@ class SelectProfileImage extends Component {
 
   selectDefault = () => {
     console.log(defaultImage);
+    this.props.navigation.navigate("ChatList");
   };
 
   render() {
