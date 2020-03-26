@@ -1,14 +1,44 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Image, TouchableNativeFeedback } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableNativeFeedback,FlatList, SafeAreaView } from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import ImagePicker from "react-native-image-picker";
+import Constants from 'expo-constants';
 
-const options = {
-  storageOptions: {
-    skipBackup: true,
-    path: "images"
-  }
-};
+
+const DATA = [
+  {
+    id: '1',
+    title: 'Username',
+    press:'a',
+  },
+  {
+    id: '2',
+    title: 'Change Password',
+    press:'b',
+  },
+  {
+    id: '3',
+    title: 'Scan QR Code',
+    press:'navigateToQrScan',
+  },
+  {
+    id: '4',
+    title: 'Show QR Code',
+    press:'navigateToQrShow',
+  },
+];
+
+function Item({ title, press }) {
+  return (
+    <View style={styles.item}>
+      <TouchableOpacity>
+      <Text style={styles.title}>{title}</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+
 
 export class Settings extends Component {
   navigateToQrScan = () => {
@@ -20,9 +50,10 @@ export class Settings extends Component {
   handleSelectImageClick = () => {
     ImagePicker.launchImageLibrary(options, response => {});
   };
+  
   render() {
     return (
-      <View>
+      <SafeAreaView style={styles.container}>
         <View style={styles.SettingsHeader}>
           <Text style={styles.SettingsText}>Settings</Text>
           <TouchableNativeFeedback >
@@ -42,30 +73,19 @@ export class Settings extends Component {
           </TouchableOpacity>
           </View>
         </View>
-        <View style={{alignItems:"center"}}>
-          <Text style={{ color: "#000", fontSize: 25}} >Atharva Pingale</Text>
-          <TextInput placeholder="Enter New Password"
-          onChangeText={password =>
-            this.setState({ password: password })
-          }
-          secureTextEntry={true}/>
-        </View>
-        <TouchableOpacity
-          style={styles.QRButton}
-          onPress={this.navigateToQrShow}
-        >
-          <Text style={styles.ButtonText} >Show QR Code</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.QRButton}
-          onPress={this.navigateToQrScan}
-        >
-          <Text style={styles.ButtonText} >Scan QR Code</Text>
-        </TouchableOpacity>
-      </View>
+        
+          <FlatList
+            data={DATA}
+            renderItem={({ item }) => <Item title={item.title} />}
+            keyExtractor={item => item.id}
+          />
+        </SafeAreaView>
+        
     );
   }
 }
+
+
 
 const styles = StyleSheet.create({
   SettingsHeader: {
@@ -121,7 +141,21 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom:10,
     right:10
-  }
+  },
+  container: {
+    flex: 1,
+    marginTop: Constants.statusBarHeight,
+  },
+  item: {
+    backgroundColor: '#fff',
+    padding: 20,
+    marginHorizontal: 5,
+    borderBottomWidth: 1,
+    borderBottomColor:'#c2c5cc'
+  },
+  title: {
+    fontSize: 20,
+  },
 });
 
 export default Settings;
