@@ -44,6 +44,9 @@ export class Settings extends Component {
   navigateToQrScan = () => {
     this.props.navigation.navigate("QrScan");
   };
+  navigateToChatlist = () => {
+    this.props.navigation.navigate("ChatList");
+  };
   navigateToQrShow = () => {
     this.props.navigation.navigate("QrShow");
   };
@@ -56,7 +59,7 @@ export class Settings extends Component {
       <SafeAreaView style={styles.container}>
         <View style={styles.SettingsHeader}>
           <Text style={styles.SettingsText}>Settings</Text>
-          <TouchableNativeFeedback >
+          <TouchableNativeFeedback onPress={this.navigateToChatlist}>
             <Text>Done</Text>
           </TouchableNativeFeedback>
         </View>
