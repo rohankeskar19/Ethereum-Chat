@@ -134,7 +134,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     display: "flex",
-
     flexDirection: "column",
     paddingTop: 20,
     alignContent: "center",
@@ -169,10 +168,8 @@ const styles = StyleSheet.create({
   },
   ButtonsContainer: {
     width: "80%",
-
     display: "flex",
     flexDirection: "row",
-
     padding: 20,
     alignItems: "center",
     justifyContent: "flex-start"

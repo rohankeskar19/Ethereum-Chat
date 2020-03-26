@@ -11,7 +11,7 @@ public class ClientHolder  {
     public static WhisperClient getWhisperClient(){
         if(whisperClient == null){
             try{
-                whisperClient = Geth.newWhisperClient("ws://10.0.2.2:8546");
+                whisperClient = Geth.newWhisperClient("ws://18.216.247.197:8546");
                 return whisperClient;
             }
             catch (Exception e){

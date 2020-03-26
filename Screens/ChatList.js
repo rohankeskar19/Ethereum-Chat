@@ -4,8 +4,7 @@ import {
   Text,
   StyleSheet,
   Image,
-  TouchableNativeFeedback,
-  BackHandler,
+  TouchableOpacity,
   NativeModules
 } from "react-native";
 
@@ -16,47 +15,20 @@ export class ChatList extends Component {
     this.props.navigation.navigate("Settings");
   };
 
-  handleBackButtonClick = () => {
-    console.log("object");
-    EthereumChatAccountModule.checkAccountCreated(
-      err => {
-        console.log("not created");
-        this.props.navigation.navigate("CreateAccount");
-        return true;
-      },
-      created => {
-        console.log("created");
-        return null;
-      }
-    );
-  };
-
-  componentDidMount() {
-    BackHandler.addEventListener(
-      "hardwareBackPress",
-      this.handleBackButtonClick
-    );
-  }
-
-  componentWillUnmount() {
-    BackHandler.removeEventListener(
-      "hardwareBackPress",
-      this.handleBackButtonClick
-    );
-  }
+  componentDidMount() {}
 
   render() {
     return (
       <View>
         <View style={styles.Header}>
           <Text style={styles.ChatsHeading}>Chats</Text>
-          <TouchableNativeFeedback onPress={this.openSettings}>
+          <TouchableOpacity onPress={this.openSettings}>
             <Image
               source={require("../assets/icons/cog-outline.png")}
               style={styles.SettingsButton}
               onPress={this.openSettings}
             />
-          </TouchableNativeFeedback>
+          </TouchableOpacity>
         </View>
       </View>
     );

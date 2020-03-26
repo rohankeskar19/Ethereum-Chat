@@ -50,10 +50,6 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
             String keyPair = whisperClient.newKeyPair(context);
 
-            //@TODO
-            // Save account in Database with name and password
-
-
             SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
 
             SharedPreferences.Editor editor = sharedPreferences.edit();
