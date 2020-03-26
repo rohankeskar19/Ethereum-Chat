@@ -1,42 +1,7 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Image, TouchableNativeFeedback,FlatList, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableNativeFeedback, SafeAreaView } from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import ImagePicker from "react-native-image-picker";
-import Constants from 'expo-constants';
-
-
-const DATA = [
-  {
-    id: '1',
-    title: 'Username',
-    press:'a',
-  },
-  {
-    id: '2',
-    title: 'Change Password',
-    press:'b',
-  },
-  {
-    id: '3',
-    title: 'Scan QR Code',
-    press:'navigateToQrScan',
-  },
-  {
-    id: '4',
-    title: 'Show QR Code',
-    press:'navigateToQrShow',
-  },
-];
-
-function Item({ title, press }) {
-  return (
-    <View style={styles.item}>
-      <TouchableOpacity>
-      <Text style={styles.title}>{title}</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
 
 
 
@@ -50,11 +15,21 @@ export class Settings extends Component {
   navigateToQrShow = () => {
     this.props.navigation.navigate("QrShow");
   };
+  navigateToChangePassword = () => {
+    this.props.navigation.navigate("ChangePassword");
+  };
   handleSelectImageClick = () => {
     ImagePicker.launchImageLibrary(options, response => {});
   };
+  onSubmitEdit = () => {
+    // whatever you want to do on submit
+  };
   
   render() {
+    this.state = {
+      inputValue:'Atharva Pingale'
+    };
+    
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.SettingsHeader}>
@@ -63,7 +38,7 @@ export class Settings extends Component {
             <Text>Done</Text>
           </TouchableNativeFeedback>
         </View>
-        <View style={{alignSelf:"center", minWidth:200, minHeight: 200}}>
+        <View style={{alignSelf:"center", minWidth:150, minHeight: 150}}>
           <Image 
             source={require("../assets/default_profile.jpg")} 
             style={styles.profileImage}>
@@ -72,16 +47,40 @@ export class Settings extends Component {
           <TouchableOpacity
             style={styles.add}
             onPress={this.handleSelectImageClick}>
-            <Text style={styles.ButtonText} >+</Text>
+            <Text style={{color:'#fff', fontSize: 25}} >+</Text>
           </TouchableOpacity>
           </View>
         </View>
+        <View style={styles.item}>
+          <TextInput
+          controlled={true}
+          onChangeText={(text) => this.setState({ inputValue: text })}
+          value={this.state.inputValue}
+          onSubmitEditing={this.onSubmitEdit}
+          style={styles.ButtonText}></TextInput>
+        </View>
+        <View style={styles.item}>
+        <TouchableOpacity
+          onPress={this.navigateToChangePassword}
+        >
+          <Text style={styles.ButtonText}>Change Password</Text>
+        </TouchableOpacity>
+        </View>
+        <View style={styles.item}>
+        <TouchableOpacity
+          onPress={this.navigateToQrShow}
+        >
+          <Text style={styles.ButtonText}>Show QR Code</Text>
+        </TouchableOpacity>
+        </View>
+        <View style={styles.item}>
+        <TouchableOpacity
+          onPress={this.navigateToQrScan}
+        >
+          <Text style={styles.ButtonText}>Scan QR Code</Text>
+        </TouchableOpacity>
+        </View>
         
-          <FlatList
-            data={DATA}
-            renderItem={({ item }) => <Item title={item.title} />}
-            keyExtractor={item => item.id}
-          />
         </SafeAreaView>
         
     );
@@ -105,32 +104,15 @@ const styles = StyleSheet.create({
     fontSize: 30
   },
   profileImage: {
-    width: 200,
-    height: 200,
+    width: 150,
+    height: 150,
     marginTop: 30,
     marginBottom: 30,
     borderRadius: 120
   },
   ButtonText: {
-    color: "#fff",
+    color: "#000",
     fontSize: 20
-  },
-  QRButton: {
-    width: "50%",
-    height: 55,
-    marginTop: 30,
-    alignSelf: "center",
-    backgroundColor: "#000",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.4,
-    textShadowOffset: {
-      width: 0,
-      height: 20
-    }
   },
   add:{
     borderRadius:30,
@@ -147,7 +129,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    marginTop: Constants.statusBarHeight,
   },
   item: {
     backgroundColor: '#fff',
@@ -155,9 +136,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     borderBottomWidth: 1,
     borderBottomColor:'#c2c5cc'
-  },
-  title: {
-    fontSize: 20,
   },
 });
 

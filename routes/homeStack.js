@@ -9,6 +9,9 @@ import QrShow from "../Screens/QrShow";
 import Login from "../Screens/Login";
 import Settings from "../Screens/Settings";
 import SelectProfileImage from "../Screens/SelectProfileImage";
+import ChangePassword from "../Screens/ChangePassword";
+
+
 
 const screens = {
   CreateAccount: {
@@ -34,6 +37,9 @@ const screens = {
   },
   SelectProfileImage: {
     screen: SelectProfileImage
+  },
+  ChangePassword : {
+    screen: ChangePassword
   }
 };
 
