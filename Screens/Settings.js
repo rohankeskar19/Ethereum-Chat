@@ -1,46 +1,39 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Image, TouchableNativeFeedback,FlatList, SafeAreaView } from "react-native";
-import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableNativeFeedback,
+  NativeModules,
+  TextInput,
+  TouchableOpacity
+} from "react-native";
 import ImagePicker from "react-native-image-picker";
-import Constants from 'expo-constants';
+import SafeAreaView from "react-native-safe-area-view";
+import { StackActions, NavigationActions } from "react-navigation";
 
-
-const DATA = [
-  {
-    id: '1',
-    title: 'Username',
-    press:'a',
-  },
-  {
-    id: '2',
-    title: 'Change Password',
-    press:'b',
-  },
-  {
-    id: '3',
-    title: 'Scan QR Code',
-    press:'navigateToQrScan',
-  },
-  {
-    id: '4',
-    title: 'Show QR Code',
-    press:'navigateToQrShow',
-  },
-];
-
-function Item({ title, press }) {
-  return (
-    <View style={styles.item}>
-      <TouchableOpacity>
-      <Text style={styles.title}>{title}</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
-
+const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 
 export class Settings extends Component {
+  state = {
+    madeChanges: false,
+    accountData: {}
+  };
+
+  componentDidMount() {
+    EthereumChatAccountModule.getAccountData(
+      err => {},
+      accountData => {
+        const accountDataToShow = JSON.parse(accountData);
+        console.log(accountDataToShow.name);
+        this.setState({
+          accountData: accountDataToShow
+        });
+      }
+    );
+  }
+
   navigateToQrScan = () => {
     this.props.navigation.navigate("QrScan");
   };
@@ -48,47 +41,150 @@ export class Settings extends Component {
     this.props.navigation.navigate("ChatList");
   };
   navigateToQrShow = () => {
-    this.props.navigation.navigate("QrShow");
+    const { madeChanges, accountData } = this.state;
+    if (madeChanges) {
+      EthereumChatAccountModule.getAccountData(
+        err => {},
+        accountData => {
+          const accountDataToPass = JSON.parse(accountData);
+          this.props.navigation.navigate("QrShow", {
+            accountData: accountDataToPass
+          });
+        }
+      );
+    } else {
+      this.props.navigation.navigate("QrShow", { accountData: accountData });
+    }
+  };
+  navigateToChangePassword = () => {
+    this.props.navigation.navigate("ChangePassword");
   };
   handleSelectImageClick = () => {
-    ImagePicker.launchImageLibrary(options, response => {});
+    ImagePicker.launchImageLibrary({}, response => {
+      if (response.didCancel || response.error || response.customButton) {
+      } else {
+        this.setState(
+          {
+            madeChanges: true
+          },
+          () => {
+            this.setState({
+              accountData: {
+                ...this.state.accountData,
+                profile_image: response.data.toString()
+              }
+            });
+          }
+        );
+      }
+    });
   };
-  
+  onSubmitEdit = () => {
+    const { accountData } = this.state;
+
+    console.log(accountData);
+
+    EthereumChatAccountModule.changeAccountData(
+      JSON.stringify(accountData),
+      err => {},
+      success => {
+        console.log("Changed accountData");
+        this.props.navigation.dispatch({
+          ...StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: "ChatList" })]
+          })
+        });
+      }
+    );
+  };
+
+  changeName = name => {
+    if (name == this.state.accountData.name) {
+    } else {
+      this.setState({
+        accountData: {
+          ...this.state.accountData,
+          name
+        },
+        madeChanges: true
+      });
+    }
+
+    console.log(this.state.accountData.name);
+  };
+
   render() {
+    const { accountData, madeChanges } = this.state;
+
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.SettingsHeader}>
           <Text style={styles.SettingsText}>Settings</Text>
-          <TouchableNativeFeedback onPress={this.navigateToChatlist}>
-            <Text>Done</Text>
+          <TouchableNativeFeedback
+            onPress={madeChanges ? this.onSubmitEdit : null}
+          >
+            <Text
+              style={[
+                madeChanges ? { color: "#000" } : { color: "#bababa" },
+                { fontSize: 20 }
+              ]}
+            >
+              Done
+            </Text>
           </TouchableNativeFeedback>
         </View>
-        <View style={{alignSelf:"center", minWidth:200, minHeight: 200}}>
-          <Image 
-            source={require("../assets/default_profile.jpg")} 
-            style={styles.profileImage}>
-          </Image>
+        <View style={{ alignSelf: "center", minWidth: 150, minHeight: 150 }}>
+          {accountData.profile_image == "default_image" ? (
+            <Image
+              source={require("../assets/default_profile.jpg")}
+              style={styles.profileImage}
+            />
+          ) : (
+            <Image
+              source={{
+                uri: `data:image/gif;base64,${accountData.profile_image}`
+              }}
+              style={styles.profileImage}
+            ></Image>
+          )}
+
           <View style={styles.newPic}>
-          <TouchableOpacity
-            style={styles.add}
-            onPress={this.handleSelectImageClick}>
-            <Text style={styles.ButtonText} >+</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.add}
+              onPress={this.handleSelectImageClick}
+            >
+              <Text style={{ color: "#fff", fontSize: 25 }}>+</Text>
+            </TouchableOpacity>
           </View>
         </View>
-        
-          <FlatList
-            data={DATA}
-            renderItem={({ item }) => <Item title={item.title} />}
-            keyExtractor={item => item.id}
-          />
-        </SafeAreaView>
-        
+        <View style={styles.item}>
+          <TextInput
+            controlled={true}
+            onChangeText={this.changeName}
+            value={accountData.name}
+            style={styles.ButtonText}
+          ></TextInput>
+        </View>
+        <View style={styles.item}>
+          <TouchableOpacity onPress={this.navigateToChangePassword}>
+            <Text style={styles.ButtonText}>Change Password</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.item}>
+          <TouchableOpacity onPress={this.navigateToQrShow}>
+            <Text style={styles.ButtonText}>Show QR Code</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.item}>
+          <TouchableOpacity onPress={this.navigateToQrScan}>
+            <Text style={styles.ButtonText}>Scan QR Code</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     );
   }
 }
-
-
 
 const styles = StyleSheet.create({
   SettingsHeader: {
@@ -105,60 +201,39 @@ const styles = StyleSheet.create({
     fontSize: 30
   },
   profileImage: {
-    width: 200,
-    height: 200,
+    width: 150,
+    height: 150,
     marginTop: 30,
     marginBottom: 30,
     borderRadius: 120
   },
   ButtonText: {
-    color: "#fff",
-    fontSize: 20
+    color: "#000",
+    fontSize: 15
   },
-  QRButton: {
-    width: "50%",
-    height: 55,
-    marginTop: 30,
-    alignSelf: "center",
-    backgroundColor: "#000",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.4,
-    textShadowOffset: {
-      width: 0,
-      height: 20
-    }
-  },
-  add:{
-    borderRadius:30,
+  add: {
+    borderRadius: 30,
     backgroundColor: "#000",
     height: 50,
-    width:50,
+    width: 50,
     justifyContent: "center",
     alignItems: "center"
   },
-  newPic:{
+  newPic: {
     position: "absolute",
-    bottom:10,
-    right:10
+    bottom: 10,
+    right: 10
   },
   container: {
-    flex: 1,
-    marginTop: Constants.statusBarHeight,
+    flex: 1
   },
   item: {
-    backgroundColor: '#fff',
-    padding: 20,
+    backgroundColor: "#fff",
+    padding: 15,
     marginHorizontal: 5,
     borderBottomWidth: 1,
-    borderBottomColor:'#c2c5cc'
-  },
-  title: {
-    fontSize: 20,
-  },
+    borderBottomColor: "#c2c5cc"
+  }
 });
 
 export default Settings;
