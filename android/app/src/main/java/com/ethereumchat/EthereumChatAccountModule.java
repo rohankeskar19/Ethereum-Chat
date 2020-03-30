@@ -25,13 +25,9 @@ import org.json.JSONObject;
 
 public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
-    private static final String TAG = "EthereumChatAccountModu";
+    private static final String TAG = "EthereumChatAccountModule";
 
 
-
-
-
-    
     public EthereumChatAccountModule(@NonNull ReactApplicationContext reactContext) {
         super(reactContext);
     }
