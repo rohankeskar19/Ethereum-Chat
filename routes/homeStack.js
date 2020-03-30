@@ -11,8 +11,6 @@ import Settings from "../Screens/Settings";
 import SelectProfileImage from "../Screens/SelectProfileImage";
 import ChangePassword from "../Screens/ChangePassword";
 
-
-
 const screens = {
   CreateAccount: {
     screen: CreateAccount
@@ -38,7 +36,7 @@ const screens = {
   SelectProfileImage: {
     screen: SelectProfileImage
   },
-  ChangePassword : {
+  ChangePassword: {
     screen: ChangePassword
   }
 };

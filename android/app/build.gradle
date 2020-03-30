@@ -145,6 +145,8 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 def enableHermes = project.ext.react.get("enableHermes", false);
 
 dependencies {
+    implementation project(':react-native-permissions')
+    implementation project(':react-native-camera')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     compile files('libs/geth.aar')
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"

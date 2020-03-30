@@ -20,6 +20,7 @@ import org.ethereum.geth.KeyStore;
 import org.ethereum.geth.Node;
 import org.ethereum.geth.NodeConfig;
 import org.ethereum.geth.WhisperClient;
+import org.json.JSONObject;
 
 
 public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
@@ -112,6 +113,53 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
         }
         else{
             success.invoke("image_set");
+        }
+    }
+
+    @ReactMethod
+    public void getAccountData(Callback err, Callback success){
+        SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
+        String name = sharedPreferences.getString("name","nodata");
+        String image = sharedPreferences.getString("profile_image","nodata");
+
+        if(name.equals("nodata") || image.equals("nodata")){
+            err.invoke();
+        }
+        else{
+            try{
+                JSONObject accountData = new JSONObject();
+
+                accountData.put("name",name);
+                accountData.put("profile_image",image);
+
+                success.invoke(accountData.toString());
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    @ReactMethod
+    public void changeAccountData(String newAccountData,Callback err,Callback success){
+        try{
+            JSONObject accountData = new JSONObject(newAccountData);
+
+            String name = accountData.getString("name");
+            String image = accountData.getString("profile_image");
+
+            SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("name",name);
+            editor.putString("profile_image",image);
+            editor.commit();
+            success.invoke("updated_profile");
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            err.invoke("error occured while updating profile");
         }
     }
 
