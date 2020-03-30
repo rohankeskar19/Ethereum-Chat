@@ -95,7 +95,7 @@ class SelectProfileImage extends Component {
       <View>
         <View style={styles.Container}>
           <Text style={styles.Header}>
-            But, before that let's setup an profile image!
+            But, before that let's setup a profile image!
           </Text>
           <Image
             source={require("../assets/default_profile.jpg")}
