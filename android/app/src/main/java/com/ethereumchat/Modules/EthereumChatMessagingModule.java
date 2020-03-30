@@ -1,4 +1,4 @@
-package com.ethereumchat;
+package com.ethereumchat.Modules;
 
 import android.accounts.AccountManager;
 import android.content.SharedPreferences;
@@ -28,10 +28,12 @@ import org.ethereum.geth.WhisperClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.ethereumchat.Database.ChatDBHelper.*;
+
 
 public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
 
-    private static final String TAG = "EthereumChatMessagingModule";
+    private static final String TAG = "EthereumChatMessagingMo";
 
 
     public EthereumChatMessagingModule(@NonNull ReactApplicationContext reactContext) {
@@ -47,24 +49,18 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getContacts(String name, Callback err,Callback success){
         Log.d(TAG, "getContacts: Called");
-        JSONArray Contacts = new JSONArray();
-        SQLiteDatabase db = this.getWritableDatabase();
-        String query = "SELECT * FROM " + ChatContract.ContactEntry.TABLE_NAME + " WHERE " + ChatContract.ContactEntry.COLUMN_NAME + "LIKE '" + name + "'";
-        Cursor cursor = db.rawQuery(query,null);
-        if (cursor.moveToFirst()){
-            do{
-                JSONObject Contact = new JSONObject();
-                Contact.putString("name",cursor.getString(0));
-                Contact.putString("public_key",cursor.getString(1));
-                Contact.putString("profile_in_string",cursor.getString(2));
-                Contacts.add(Contact);
-            }while (cursor.moveToNext());
-            success.invoke(Contacts.toString());
+
+
+        ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
+        String contactsArray = chatDBHelper.getContactsDB(name);
+
+        if (contactsArray.equals("error")){
+            err.invoke(contactsArray);
         }
-        else{
-            err.invoke();
+        else {
+
+            success.invoke(contactsArray);
         }
-        cursor.close();
 
 
     }

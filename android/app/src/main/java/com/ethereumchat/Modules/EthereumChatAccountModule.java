@@ -1,4 +1,4 @@
-package com.ethereumchat;
+package com.ethereumchat.Modules;
 
 import android.accounts.AccountManager;
 import android.content.SharedPreferences;
