@@ -15,7 +15,6 @@ export class QrShow extends Component {
     this.setState({
       accountData
     });
-    console.log(this.props.navigation);
   }
 
   render() {

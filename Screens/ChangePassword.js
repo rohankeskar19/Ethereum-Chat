@@ -58,19 +58,19 @@ const styles = StyleSheet.create({
   },
   item: {
     backgroundColor: "#fff",
-    padding: 20,
+    padding: 15,
     marginHorizontal: 5,
     borderBottomWidth: 1,
     borderBottomColor: "#c2c5cc"
   },
   ButtonText: {
     color: "#000",
-    fontSize: 20
+    fontSize: 15
   },
   DoneButton: {
     width: "50%",
     height: 55,
-    marginTop: 30,
+    marginTop: 50,
     alignSelf: "center",
     backgroundColor: "#000",
     display: "flex",

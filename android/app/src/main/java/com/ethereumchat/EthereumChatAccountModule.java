@@ -117,10 +117,11 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getAccountData(Callback err, Callback success){
+    public void getQRCodeData(Callback err, Callback success){
         SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
         String name = sharedPreferences.getString("name","nodata");
         String image = sharedPreferences.getString("profile_image","nodata");
+        String pubkey = sharedPreferences.getString("profile_image","nodata");
 
         if(name.equals("nodata") || image.equals("nodata")){
             err.invoke();
@@ -131,6 +132,7 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
                 accountData.put("name",name);
                 accountData.put("profile_image",image);
+
 
                 success.invoke(accountData.toString());
             }

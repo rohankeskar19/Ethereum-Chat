@@ -68,6 +68,7 @@ export class Settings extends Component {
             madeChanges: true
           },
           () => {
+            console.log(response.data.toString().length);
             this.setState({
               accountData: {
                 ...this.state.accountData,
