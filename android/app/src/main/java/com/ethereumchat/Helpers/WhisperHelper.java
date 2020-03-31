@@ -21,7 +21,9 @@ public class WhisperHelper {
 
             byte[] key = whisperClient.getPublicKey(context,keyPair);
 
-            String publicKey = new String(key, "UTF-8");
+            Log.d(TAG, "getPublicKey: byte " + new String(whisperClient.getPublicKey(context,keyPair)));
+
+            String publicKey = new String(key);
             Log.d(TAG, "getPublicKey: " + publicKey);
             return publicKey;
         }

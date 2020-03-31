@@ -23,7 +23,7 @@ export class QrShow extends Component {
     return (
       <View style={styles.qr}>
         <QRCode
-          value={JSON.stringify(accountData.profile_image)}
+          value={JSON.stringify(accountData)}
           size={250}
           color="black"
           backgroundColor="white"

@@ -123,7 +123,13 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
                 JSONObject qrCodeData = new JSONObject();
 
                 qrCodeData.put("name",name);
-                String finalImage = CompressionHandler.compressProfile(image);
+                String finalImage = "";
+                if (!image.equals("default_image")){
+                     finalImage = CompressionHandler.compressProfile(image);
+                }else{
+                    finalImage = image;
+                }
+
 
                 qrCodeData.put("profile_image",finalImage);
                 String publicKey = WhisperHelper.getPublicKey(keyPair);
