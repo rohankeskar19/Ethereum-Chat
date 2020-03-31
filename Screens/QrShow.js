@@ -19,10 +19,11 @@ export class QrShow extends Component {
 
   render() {
     const { accountData } = this.state;
+    console.log(accountData);
     return (
       <View style={styles.qr}>
         <QRCode
-          value={JSON.stringify(accountData)}
+          value={JSON.stringify(accountData.profile_image)}
           size={250}
           color="black"
           backgroundColor="white"

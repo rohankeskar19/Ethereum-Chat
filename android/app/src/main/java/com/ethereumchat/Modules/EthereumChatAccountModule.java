@@ -1,31 +1,27 @@
 package com.ethereumchat.Modules;
 
-import android.accounts.AccountManager;
 import android.content.SharedPreferences;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.ethereumchat.Database.ChatDBHelper;
 import com.ethereumchat.Helpers.ClientHolder;
+import com.ethereumchat.Helpers.CompressionHandler;
+import com.ethereumchat.Helpers.WhisperHelper;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.uimanager.IllegalViewOperationException;
 
 import org.ethereum.geth.Context;
 import org.ethereum.geth.Geth;
-import org.ethereum.geth.KeyStore;
-import org.ethereum.geth.Node;
-import org.ethereum.geth.NodeConfig;
 import org.ethereum.geth.WhisperClient;
 import org.json.JSONObject;
 
 
 public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
-    private static final String TAG = "EthereumChatAccountModule";
+    private static final String TAG = "EthereumChatAccountModu";
 
 
     public EthereumChatAccountModule(@NonNull ReactApplicationContext reactContext) {
@@ -117,10 +113,40 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
         SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
         String name = sharedPreferences.getString("name","nodata");
         String image = sharedPreferences.getString("profile_image","nodata");
-        String pubkey = sharedPreferences.getString("profile_image","nodata");
+        String keyPair = sharedPreferences.getString("key_pair","nodata");
+
+        if(name.equals("nodata") || image.equals("nodata") || keyPair.equals("nodata")){
+            err.invoke("error occured");
+        }
+        else{
+            try{
+                JSONObject qrCodeData = new JSONObject();
+
+                qrCodeData.put("name",name);
+                String finalImage = CompressionHandler.compressProfile(image);
+
+                qrCodeData.put("profile_image",finalImage);
+                String publicKey = WhisperHelper.getPublicKey(keyPair);
+                Log.d(TAG, "getQRCodeData: " + publicKey);
+                qrCodeData.put("public_key",publicKey);
+
+                success.invoke(qrCodeData.toString());
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                err.invoke("error occured");
+            }
+
+        }
+    }
+
+    @ReactMethod void getAccountData(Callback err,Callback success){
+        SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
+        String name = sharedPreferences.getString("name","nodata");
+        String image = sharedPreferences.getString("profile_image","nodata");
 
         if(name.equals("nodata") || image.equals("nodata")){
-            err.invoke();
+            err.invoke("error occured");
         }
         else{
             try{
@@ -134,10 +160,13 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
             }
             catch (Exception e){
                 e.printStackTrace();
+                err.invoke("error occured");
             }
 
         }
+
     }
+
 
     @ReactMethod
     public void changeAccountData(String newAccountData,Callback err,Callback success){

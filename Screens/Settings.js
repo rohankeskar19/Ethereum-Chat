@@ -42,19 +42,16 @@ export class Settings extends Component {
   };
   navigateToQrShow = () => {
     const { madeChanges, accountData } = this.state;
-    if (madeChanges) {
-      EthereumChatAccountModule.getAccountData(
-        err => {},
-        accountData => {
-          const accountDataToPass = JSON.parse(accountData);
-          this.props.navigation.navigate("QrShow", {
-            accountData: accountDataToPass
-          });
-        }
-      );
-    } else {
-      this.props.navigation.navigate("QrShow", { accountData: accountData });
-    }
+
+    EthereumChatAccountModule.getQRCodeData(
+      err => {},
+      accountData => {
+        const accountDataToPass = JSON.parse(accountData);
+        this.props.navigation.navigate("QrShow", {
+          accountData: accountDataToPass
+        });
+      }
+    );
   };
   navigateToChangePassword = () => {
     this.props.navigation.navigate("ChangePassword");

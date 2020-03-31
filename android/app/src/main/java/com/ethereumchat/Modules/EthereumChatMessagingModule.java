@@ -52,7 +52,7 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
 
 
         ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
-        String contactsArray = chatDBHelper.getContactsDB(name);
+        String contactsArray = chatDBHelper.getAllContacts(name);
 
         if (contactsArray.equals("error")){
             err.invoke(contactsArray);
