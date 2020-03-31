@@ -15,11 +15,11 @@ export class QrShow extends Component {
     this.setState({
       accountData
     });
-    console.log(this.props.navigation);
   }
 
   render() {
     const { accountData } = this.state;
+    console.log(accountData);
     return (
       <View style={styles.qr}>
         <QRCode

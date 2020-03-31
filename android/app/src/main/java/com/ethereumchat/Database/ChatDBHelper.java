@@ -15,6 +15,9 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 public class ChatDBHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "chat.db";
@@ -91,6 +94,41 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         }
 
         return null;
+
+    }
+
+    public String getAllContacts(String name){
+        JSONArray contacts = new JSONArray();
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "SELECT * FROM " + ChatContract.ContactEntry.TABLE_NAME + " WHERE " + ChatContract.ContactEntry.COLUMN_NAME + " LIKE '" + name + "%'";
+        Cursor cursor = db.rawQuery(query,null);
+
+        if (cursor.moveToFirst()){
+            do{
+                try{
+                    JSONObject contact = new JSONObject();
+
+                    contact.put("name",cursor.getString(0));
+                    contact.put("public_key",cursor.getString(1));
+                    contact.put("profile_in_string",cursor.getString(2));
+
+                    contacts.put(contact);
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                    return "error";
+                }
+
+            }while (cursor.moveToNext());
+            cursor.close();
+            return contacts.toString();
+        }
+        else{
+            cursor.close();
+
+            return contacts.toString();
+        }
+
 
     }
 
@@ -225,33 +263,33 @@ public class ChatDBHelper extends SQLiteOpenHelper {
 
     }
 
-    public List<Contact> getAllContact(){
-        Log.d(TAG, "getAllContact: Called");
-        List<Contact> contactList = new ArrayList<>();
-
-        String query = "SELECT * FROM " + ContactEntry.TABLE_NAME + " ORDER BY " + ContactEntry.COLUMN_NAME + " ASC";
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        Cursor cursor = db.rawQuery(query,null);
-
-        if (cursor.moveToFirst()){
-            do{
-                Log.d(TAG, "checkIfContactExists: " + cursor.getString(0));
-                Log.d(TAG, "checkIfContactExists: " + cursor.getString(1));
-                Log.d(TAG, "checkIfContactExists: " + cursor.getString(2));
-
-
-                Contact contact = new Contact(cursor.getString(0),cursor.getString(1),cursor.getString(2));
-
-                contactList.add(contact);
-            }
-            while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return contactList;
-    }
+//    public List<Contact> getAllContact(){
+//        Log.d(TAG, "getAllContact: Called");
+//        List<Contact> contactList = new ArrayList<>();
+//
+//        String query = "SELECT * FROM " + ContactEntry.TABLE_NAME + " ORDER BY " + ContactEntry.COLUMN_NAME + " ASC";
+//
+//        SQLiteDatabase db = this.getWritableDatabase();
+//
+//        Cursor cursor = db.rawQuery(query,null);
+//
+//        if (cursor.moveToFirst()){
+//            do{
+//                Log.d(TAG, "checkIfContactExists: " + cursor.getString(0));
+//                Log.d(TAG, "checkIfContactExists: " + cursor.getString(1));
+//                Log.d(TAG, "checkIfContactExists: " + cursor.getString(2));
+//
+//
+//                Contact contact = new Contact(cursor.getString(0),cursor.getString(1),cursor.getString(2));
+//
+//                contactList.add(contact);
+//            }
+//            while (cursor.moveToNext());
+//        }
+//
+//        cursor.close();
+//        return contactList;
+//    }
 
     public Contact getContact(String publicKey){
         Log.d(TAG, "getContact: Called");
