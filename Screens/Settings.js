@@ -168,17 +168,26 @@ export class Settings extends Component {
           ></TextInput>
         </View>
         <View style={styles.item}>
-          <TouchableOpacity onPress={this.navigateToChangePassword}>
+          <TouchableOpacity
+            onPress={this.navigateToChangePassword}
+            style={styles.itemTouchableOpacity}
+          >
             <Text style={styles.ButtonText}>Change Password</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.item}>
-          <TouchableOpacity onPress={this.navigateToQrShow}>
+          <TouchableOpacity
+            onPress={this.navigateToQrShow}
+            style={styles.itemTouchableOpacity}
+          >
             <Text style={styles.ButtonText}>Show QR Code</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.item}>
-          <TouchableOpacity onPress={this.navigateToQrScan}>
+          <TouchableOpacity
+            onPress={this.navigateToQrScan}
+            style={styles.itemTouchableOpacity}
+          >
             <Text style={styles.ButtonText}>Scan QR Code</Text>
           </TouchableOpacity>
         </View>
@@ -234,6 +243,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     borderBottomWidth: 1,
     borderBottomColor: "#c2c5cc"
+  },
+  itemTouchableOpacity: {
+    width: "100%"
   }
 });
 

@@ -14,28 +14,30 @@ export class ChangePassword extends Component {
         <View style={styles.ChangePasswordHeader}>
           <Text style={styles.ChangePasswordText}>Change Password</Text>
         </View>
-        <View style={styles.item}>
-          <TextInput
-            placeholder="Enter Current Password"
-            style={styles.ButtonText}
-          ></TextInput>
-        </View>
-        <View style={styles.item}>
-          <TextInput
-            placeholder="Enter New Password"
-            style={styles.ButtonText}
-          ></TextInput>
-        </View>
-        <View style={styles.item}>
-          <TextInput
-            placeholder="Confirm Password"
-            style={styles.ButtonText}
-          ></TextInput>
-        </View>
-        <View>
-          <TouchableOpacity style={styles.DoneButton}>
-            <Text style={{ color: "#fff", fontSize: 25 }}>Done</Text>
-          </TouchableOpacity>
+        <View style={styles.Container}>
+          <View style={styles.item}>
+            <TextInput
+              placeholder="Enter Current Password"
+              style={styles.ButtonText}
+            ></TextInput>
+          </View>
+          <View style={styles.item}>
+            <TextInput
+              placeholder="Enter New Password"
+              style={styles.ButtonText}
+            ></TextInput>
+          </View>
+          <View style={styles.item}>
+            <TextInput
+              placeholder="Confirm Password"
+              style={styles.ButtonText}
+            ></TextInput>
+          </View>
+          <View>
+            <TouchableOpacity style={styles.DoneButton}>
+              <Text style={{ color: "#fff", fontSize: 25 }}>Done</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -83,6 +85,11 @@ const styles = StyleSheet.create({
       width: 0,
       height: 20
     }
+  },
+  Container: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#fff"
   }
 });
 

@@ -34,12 +34,13 @@ public class ChatDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        final String SQLITE_CREATE_CONVERSATIONS_TABLE = "CREATE TABLE " + ConversationEntry.TABLE_NAME + " (" + ConversationEntry.COLUMN_NAME + " VARCHAR(40) NOT NULL, " +  ConversationEntry.COLUMN_PUBLIC_KEY + " VARCHAR(500) NOT NULL, " +  ConversationEntry.COLUMN_PROFILE_IN_STRING + " VARCHAR(500) NOT NULL, " + ConversationEntry.COLUMN_LAST_MESSAGE + " VARCHAR(65535) NOT NULL, " + ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP + " VARCHAR(25) NOT NULL, " + ConversationEntry.COLUMN_READ + " VARCHAR(10) NOT NULL);";
+        final String SQLITE_CREATE_CONVERSATIONS_TABLE = "CREATE TABLE " + ConversationEntry.TABLE_NAME + " (" + ConversationEntry.COLUMN_NAME + " VARCHAR(40) NOT NULL, " +  ConversationEntry.COLUMN_PUBLIC_KEY + " VARCHAR(500) NOT NULL, " +  ConversationEntry.COLUMN_PROFILE_IN_STRING + " VARCHAR(65535) NOT NULL, " + ConversationEntry.COLUMN_LAST_MESSAGE + " VARCHAR(65535) NOT NULL, " + ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP + " VARCHAR(25) NOT NULL, " + ConversationEntry.COLUMN_READ + " VARCHAR(10) NOT NULL);";
         final String SQLITE_CREATE_MESSAGES_TABLE = "CREATE TABLE " + MessageEntry.TABLE_NAME + " ("  + MessageEntry.COLUMN_NAME + " VARCHAR(30) NOT NULL, " + MessageEntry.COLUMN_TIMESTAMP + " VARCHAR(25) NOT NULL, " + MessageEntry.COLUMN_IS_IMAGE + " VARCHAR(20) NOT NULL, " + MessageEntry.COLUMN_MESSAGE + " VARCHAR(65535) NOT NULL, " + MessageEntry.COLUMN_FROM_PUBLIC_KEY + " VARCHAR(500) NOT NULL, "  + MessageEntry.COLUMN_TO_PUBLIC_KEY + " VARCHAR(30) NOT NULL);";
-        final String SQLITE_CREATE_CONTACTS_TABLE = "CREATE TABLE " + ContactEntry.TABLE_NAME + " (" + ContactEntry.COLUMN_NAME + " VARCHAR(40) NOT NULL, " +  ContactEntry.COLUMN_PUBLIC_KEY + " VARCHAR(500) NOT NULL, " +  ContactEntry.COLUMN_PROFILE_IN_STRING + " VARCHAR(500) NOT NULL);";
+        final String SQLITE_CREATE_CONTACTS_TABLE = "CREATE TABLE " + ContactEntry.TABLE_NAME + " (" + ContactEntry.COLUMN_NAME + " VARCHAR(40) NOT NULL, " +  ContactEntry.COLUMN_PUBLIC_KEY + " VARCHAR(500) NOT NULL, " +  ContactEntry.COLUMN_PROFILE_IN_STRING + " VARCHAR(65535) NOT NULL);";
         //final String SQLITE_CREATE_ACCOUNT_TABLE = "CREATE TABLE " + AccountEntry.TABLE_NAME + " ("  + AccountEntry.COLUMN_NAME + " VARCHAR(30) NOT NULL, " + AccountEntry.COLUMN_PUBLIC_KEY + " VARCHAR(25) NOT NULL, " + AccountEntry.COLUMN_PRIVATE_KEY + " VARCHAR(20) NOT NULL, " + AccountEntry.COLUMN_PASSWORD + " VARCHAR(20) NOT NULL, " + AccountEntry.COLUMN_KEYPAIR + " VARCHAR(65535) NOT NULL);";
         db.execSQL(SQLITE_CREATE_CONVERSATIONS_TABLE);
         db.execSQL(SQLITE_CREATE_MESSAGES_TABLE);
+        db.execSQL(SQLITE_CREATE_CONTACTS_TABLE);
 
     }
 
@@ -249,17 +250,25 @@ public class ChatDBHelper extends SQLiteOpenHelper {
     }
 
 
-    public void addContact(Contact contact){
-        SQLiteDatabase db = this.getWritableDatabase();
-        Log.d(TAG, "addContact: " + contact.toString());
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(ContactEntry.COLUMN_NAME,contact.getName());
-        contentValues.put(ContactEntry.COLUMN_PUBLIC_KEY,contact.getPublicKey());
-        contentValues.put(ContactEntry.COLUMN_PROFILE_IN_STRING, contact.getProfileInString());
+    public boolean addContact(Contact contact){
+        try{
+            SQLiteDatabase db = this.getWritableDatabase();
+            Log.d(TAG, "addContact: " + contact.toString());
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(ContactEntry.COLUMN_NAME,contact.getName());
+            contentValues.put(ContactEntry.COLUMN_PUBLIC_KEY,contact.getPublicKey());
+            contentValues.put(ContactEntry.COLUMN_PROFILE_IN_STRING, contact.getProfileInString());
 
-        db.insert(ContactEntry.TABLE_NAME,null,contentValues);
+            db.insert(ContactEntry.TABLE_NAME,null,contentValues);
 
-        db.close();
+            db.close();
+            return true;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+
 
     }
 

@@ -24,7 +24,7 @@ export class QrShow extends Component {
       <View style={styles.qr}>
         <QRCode
           value={JSON.stringify(accountData)}
-          size={250}
+          size={300}
           color="black"
           backgroundColor="white"
         />
