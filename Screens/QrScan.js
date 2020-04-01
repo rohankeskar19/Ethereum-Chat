@@ -1,11 +1,41 @@
 import React, { Component } from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  NativeModules
+} from "react-native";
 import QRCodeScanner from "react-native-qrcode-scanner";
 import { RNCamera as Camera } from "react-native-camera";
 
+const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
+
 export class QrScan extends Component {
-  onSuccess = data => {
-    console.log(data);
+  onSuccess = e => {
+    const data = JSON.parse(e.data);
+
+    const name = data.name;
+    const pubKey = data.public_key;
+    const image = "default_image";
+
+    if (!name || !pubKey || !image) {
+    } else {
+      EthereumChatAccountModule.saveAccount(
+        name,
+        pubKey,
+        image,
+        err => {},
+        success => {
+          console.log("Saved account");
+          this.props.navigation.goBack(null);
+        }
+      );
+    }
+  };
+
+  closeScanner = () => {
+    this.props.navigation.pop(null);
   };
 
   render() {
@@ -38,9 +68,15 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 21,
-    color: "rgb(0,122,255)"
+    color: "#fff",
+    marginTop: 10,
+    width: "100%",
+    textAlign: "center",
+    backgroundColor: "#000",
+    padding: 10
   },
   buttonTouchable: {
+    width: "100%",
     padding: 16
   }
 });

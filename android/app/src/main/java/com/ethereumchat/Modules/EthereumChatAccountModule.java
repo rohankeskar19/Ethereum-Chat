@@ -5,9 +5,11 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.ethereumchat.Database.ChatDBHelper;
 import com.ethereumchat.Helpers.ClientHolder;
 import com.ethereumchat.Helpers.CompressionHandler;
 import com.ethereumchat.Helpers.WhisperHelper;
+import com.ethereumchat.Models.Contact;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -112,10 +114,9 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
     public void getQRCodeData(Callback err, Callback success){
         SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
         String name = sharedPreferences.getString("name","nodata");
-        String image = sharedPreferences.getString("profile_image","nodata");
         String keyPair = sharedPreferences.getString("key_pair","nodata");
 
-        if(name.equals("nodata") || image.equals("nodata") || keyPair.equals("nodata")){
+        if(name.equals("nodata")|| keyPair.equals("nodata")){
             err.invoke("error occured");
         }
         else{
@@ -123,15 +124,8 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
                 JSONObject qrCodeData = new JSONObject();
 
                 qrCodeData.put("name",name);
-                String finalImage = "";
-                if (!image.equals("default_image")){
-                     finalImage = CompressionHandler.compressProfile(image);
-                }else{
-                    finalImage = image;
-                }
 
-
-                qrCodeData.put("profile_image",finalImage);
+//                qrCodeData.put("profile_image",finalImage);
                 String publicKey = WhisperHelper.getPublicKey(keyPair);
                 Log.d(TAG, "getQRCodeData: " + publicKey);
                 qrCodeData.put("public_key",publicKey);
@@ -173,6 +167,22 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
     }
 
+
+    @ReactMethod
+    public void saveAccount(String name,String publicKey,String image,Callback err,Callback success){
+        Contact contact = new Contact(name,publicKey,image);
+
+        ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
+
+        if(chatDBHelper.addContact(contact)){
+            success.invoke("saved contact");
+        }
+        else{
+            err.invoke("error");
+        }
+
+
+    }
 
     @ReactMethod
     public void changeAccountData(String newAccountData,Callback err,Callback success){
