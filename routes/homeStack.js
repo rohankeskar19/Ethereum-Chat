@@ -10,8 +10,12 @@ import Login from "../Screens/Login";
 import Settings from "../Screens/Settings";
 import SelectProfileImage from "../Screens/SelectProfileImage";
 import ChangePassword from "../Screens/ChangePassword";
+import SplashScreen from "../Screens/SplashScreen";
 
 const screens = {
+  SplashScreen: {
+    screen: SplashScreen
+  },
   CreateAccount: {
     screen: CreateAccount
   },
