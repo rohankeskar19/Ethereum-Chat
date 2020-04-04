@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import { View } from "react-native";
 import {
   Text,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
   KeyboardAvoidingView,
   TextInput,
   TouchableHighlight,
@@ -11,11 +11,6 @@ import {
 } from "react-native";
 import KeyboardSpacer from "react-native-keyboard-spacer";
 import AutogrowInput from "react-native-autogrow-input";
-import { white } from "color-name";
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 export default class Chat extends Component {
   constructor(props) {
@@ -118,6 +113,7 @@ export default class Chat extends Component {
           <Text style={{ color: "white" }}>Photo & Name</Text>
         </View>
         <ScrollView
+          showsVerticalScrollIndicator={false}
           ref={ref => {
             this.scrollView = ref;
           }}
@@ -187,12 +183,14 @@ class InputBar extends Component {
           onContentSizeChange={this.props.onSizeChange}
           value={this.props.text}
         />
-        <TouchableHighlight
-          style={styles.sendButton}
-          onPress={() => this.props.onSendPressed()}
-        >
-          <Text style={{ color: "white" }}>Send</Text>
-        </TouchableHighlight>
+        <View>
+          <TouchableHighlight
+            style={styles.sendButton}
+            onPress={() => this.props.onSendPressed()}
+          >
+            <Text style={{ color: "white" }}>Send</Text>
+          </TouchableHighlight>
+        </View>
       </View>
     );
   }
@@ -232,6 +230,7 @@ const styles = StyleSheet.create({
   },
 
   textBox: {
+    overflow: "hidden",
     borderRadius: 15,
     borderWidth: 1,
     borderColor: "gray",
@@ -241,6 +240,7 @@ const styles = StyleSheet.create({
   },
 
   sendButton: {
+    height: 30,
     justifyContent: "center",
     alignItems: "center",
     paddingLeft: 15,
@@ -258,7 +258,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginRight: 10,
     marginLeft: 10,
-    maxWidth: 150,
     paddingHorizontal: 10,
     paddingVertical: 5,
     justifyContent: "flex-start",
