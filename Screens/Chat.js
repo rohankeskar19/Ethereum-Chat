@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View } from "react-native";
-import { Text, View, StyleSheet, ScrollView, KeyboardAvoidingView, TextInput, TouchableHighlight, Keyboard } from 'react-native';
+import { Text, StyleSheet, ScrollView, KeyboardAvoidingView, TextInput, TouchableHighlight, Keyboard } from 'react-native';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import AutogrowInput from 'react-native-autogrow-input';
 
@@ -13,24 +13,7 @@ export default class Chat extends Component {
   constructor(props) {
     super(props);
 
-    var msg = 'Message';
-
-    var numberOfMessages = 20;
-
     var messages = [];
-
-    for(var i = 0; i < numberOfMessages; i++) {
-      var messageLength = getRandomInt(10, 120);
-
-      var direction = getRandomInt(1, 2) === 1 ? 'right' : 'left';
-
-      message = msg.substring(0, messageLength);
-
-      messages.push({
-        direction: direction,
-        text: message
-      })
-    }
 
     this.state = {
       messages: messages,
