@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   },
 
   messageBubbleLeft: {
-    backgroundColor: '#d5d8d4',
+    backgroundColor: 'gray',
   },
 
   messageBubbleTextLeft: {
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   },
 
   messageBubbleRight: {
-    backgroundColor: '#66db30'
+    backgroundColor: 'black'
   },
 
   messageBubbleTextRight: {
