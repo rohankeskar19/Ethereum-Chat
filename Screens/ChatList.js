@@ -13,36 +13,44 @@ import { TextInput } from "react-native-gesture-handler";
 const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 const EthereumChatMessagingModule = NativeModules.EthereumChatMessagingModule;
 
-function Item(item) {
-  console.log(item);
-  var contact = {}
-  if(item){
-    contact = item.contact.item;
-  }
-  return (
-    <View style={styles.ContactItem}>
-      {contact.profile_in_string == "default_image" ? (
-        <Image
-          source={require("../assets/default_profile.jpg")}
-          style={styles.ContactImage}
-        />
-      ) : (
-        <Image
-          source={{
-            uri: `data:image/gif;base64,${contact.profile_in_string}`,
-          }}
-          style={styles.ContactImage}
-        />
-      )}
-      <Text style={styles.ContactName}>{contact.name}</Text>
-    </View>
-  );
-}
-
 export class ChatList extends Component {
   state = {
     contacts: null,
     recentChat: [],
+  };
+
+  Item = (item) => {
+    var contact = {};
+    if (item) {
+      contact = item.contact.item;
+    }
+
+    return (
+      <TouchableOpacity
+        style={styles.ContactItem}
+        onPress={() => this.navigate(contact)}
+      >
+        {contact.profile_in_string == "default_image" ? (
+          <Image
+            source={require("../assets/default_profile.jpg")}
+            style={styles.ContactImage}
+          />
+        ) : (
+          <Image
+            source={{
+              uri: `data:image/gif;base64,${contact.profile_in_string}`,
+            }}
+            style={styles.ContactImage}
+          />
+        )}
+        <Text style={styles.ContactName}>{contact.name}</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  navigate = (contact) => {
+    this.props.navigation.navigate("Chat");
+    console.log("clicked");
   };
 
   openSettings = () => {
@@ -59,7 +67,6 @@ export class ChatList extends Component {
         text,
         (err) => {},
         (contacts) => {
-          console.log(contacts);
           this.setState({
             contacts: JSON.parse(contacts),
           });
@@ -74,7 +81,7 @@ export class ChatList extends Component {
 
   render() {
     const { contacts } = this.state;
-    // console.log(contacts);
+
     return (
       <View>
         <View style={styles.Header}>
@@ -96,28 +103,9 @@ export class ChatList extends Component {
           <FlatList
             style={styles.ChatList}
             data={contacts}
-            renderItem={(contact) => <Item contact={contact} />}
+            renderItem={(contact) => <this.Item contact={contact} />}
             keyExtractor={(contact, index) => index.toString()}
           />
-          {/* {contacts &&
-            contacts.map(contact => (
-              <View style={styles.ContactItem}>
-                {contact.profile_in_string == "default_image" ? (
-                  <Image
-                    source={require("../assets/default_profile.jpg")}
-                    style={styles.ContactImage}
-                  />
-                ) : (
-                  <Image
-                    source={{
-                      uri: `data:image/gif;base64,${contact.profile_in_string}`
-                    }}
-                    style={styles.ContactImage}
-                  />
-                )}
-                <Text style={styles.ContactName}>{contact.name}</Text>
-              </View>
-            ))} */}
         </View>
       </View>
     );
