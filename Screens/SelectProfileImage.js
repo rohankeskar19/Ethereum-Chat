@@ -164,7 +164,9 @@ const styles = StyleSheet.create({
   },
   Header: {
     color: "#000",
-    fontSize: 20
+    fontSize: 20,
+    textAlign: "center",
+    width: "100%"
   },
   ButtonsContainer: {
     width: "80%",

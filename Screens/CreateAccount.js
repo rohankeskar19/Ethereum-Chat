@@ -8,7 +8,7 @@ import {
   Animated,
   TouchableOpacity,
   Text,
-  TextInput
+  TextInput,
 } from "react-native";
 import { StackActions, NavigationActions } from "react-navigation";
 
@@ -25,31 +25,31 @@ class CreateAccount extends Component {
     errorOccured: false,
     creatingAccount: false,
     keyPairCopied: false,
-    progressXPos: new Animated.Value(0)
+    progressXPos: new Animated.Value(0),
   };
 
-  componentDidMount() {
-    EthereumChatAccountModule.checkAccountCreated(
-      err => {},
-      created => {
-        this.props.navigation.dispatch({
-          ...StackActions.reset({
-            index: 0,
-            actions: [
-              NavigationActions.navigate({ routeName: "SelectProfileImage" })
-            ]
-          })
-        });
-      }
-    );
-  }
+  // componentDidMount() {
+  //   EthereumChatAccountModule.checkAccountCreated(
+  //     err => {},
+  //     created => {
+  //       this.props.navigation.dispatch({
+  //         ...StackActions.reset({
+  //           index: 0,
+  //           actions: [
+  //             NavigationActions.navigate({ routeName: "SelectProfileImage" })
+  //           ]
+  //         })
+  //       });
+  //     }
+  //   );
+  // }
 
   handleCreateAccount = () => {
     const { name, password } = this.state;
     console.log(this.state);
     if (name.trim() == "" || password.trim() == "") {
       this.setState({
-        errorOccured: true
+        errorOccured: true,
       });
     } else {
       console.log("Creating account", this.state);
@@ -57,27 +57,27 @@ class CreateAccount extends Component {
         Animated.sequence([
           Animated.timing(this.state.progressXPos, {
             toValue: 241,
-            duration: 400
+            duration: 400,
           }),
           Animated.timing(this.state.progressXPos, {
             toValue: 0,
-            duration: 400
-          })
+            duration: 400,
+          }),
         ])
       ).start();
       this.setState(
         {
-          creatingAccount: true
+          creatingAccount: true,
         },
         () => {
           EthereumChatAccountModule.createAccount(
             name.toString(),
             password.toString(),
-            err => console.log(err),
-            key => {
+            (err) => console.log(err),
+            (key) => {
               this.setState({
                 keyPair: key,
-                creatingAccount: false
+                creatingAccount: false,
               });
             }
           );
@@ -90,7 +90,7 @@ class CreateAccount extends Component {
     const { keyPair } = this.state;
     this.setState(
       {
-        keyPairCopied: true
+        keyPairCopied: true,
       },
       () => {
         Clipboard.setString(keyPair);
@@ -107,10 +107,10 @@ class CreateAccount extends Component {
       errorOccured,
       keyPair,
       creatingAccount,
-      keyPairCopied
+      keyPairCopied,
     } = this.state;
     const animtedStyle = {
-      transform: [{ translateX: this.state.progressXPos }]
+      transform: [{ translateX: this.state.progressXPos }],
     };
 
     return (
@@ -129,21 +129,21 @@ class CreateAccount extends Component {
                 <View style={styles.FormContainer}>
                   <TextInput
                     placeholder="Enter your name"
-                    onChangeText={name => this.setState({ name: name })}
+                    onChangeText={(name) => this.setState({ name: name })}
                     style={[
                       errorOccured == true ? styles.errorOutline : null,
-                      styles.Input
+                      styles.Input,
                     ]}
                   />
                   <TextInput
                     placeholder="Enter your password"
-                    onChangeText={password =>
+                    onChangeText={(password) =>
                       this.setState({ password: password })
                     }
                     secureTextEntry={true}
                     style={[
                       errorOccured == true ? styles.errorOutline : null,
-                      styles.Input
+                      styles.Input,
                     ]}
                   />
                   <TouchableOpacity
@@ -161,9 +161,9 @@ class CreateAccount extends Component {
                     display: "flex",
                     flexDirection: "column",
                     alignContent: "space-between",
-                    padding: 25
+                    padding: 25,
                   },
-                  styles.Container
+                  styles.Container,
                 ]}
               >
                 <Text style={styles.KeyHeader}>
@@ -203,19 +203,19 @@ const styles = StyleSheet.create({
     borderColor: "#ba2525",
     borderWidth: 1,
     borderRadius: 5,
-    padding: 10
+    padding: 10,
   },
   progressBar: {
     width: "60%",
     height: 5,
     backgroundColor: "#bababa",
-    borderRadius: 5
+    borderRadius: 5,
   },
   progress: {
     width: 5,
     height: 5,
     backgroundColor: "#000",
-    borderRadius: 5
+    borderRadius: 5,
   },
 
   container: {
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignContent: "center",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   Container: {
     display: "flex",
@@ -237,18 +237,18 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     width: width,
-    height: height
+    height: height,
   },
   FormContainer: {
     width: "100%",
     height: "70%",
-    padding: 20
+    padding: 20,
   },
   Header: {
     color: "#000",
     fontSize: 40,
     padding: 10,
-    marginLeft: 10
+    marginLeft: 10,
   },
   Input: {
     width: "100%",
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     padding: 10,
     marginTop: 10,
-    marginBottom: 15
+    marginBottom: 15,
   },
   CreateAccountButton: {
     width: "100%",
@@ -272,36 +272,36 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     textShadowOffset: {
       width: 0,
-      height: 20
-    }
+      height: 20,
+    },
   },
   ButtonText: {
     color: "#fff",
-    fontSize: 20
+    fontSize: 20,
   },
   TakeMeToAppButton: {
     width: "100%",
     height: 55,
-    marginTop: 55
+    marginTop: 55,
   },
   TakeMeToAppText: {
     color: "#000",
     fontSize: 22,
-    textAlign: "center"
+    textAlign: "center",
   },
   KeyHeader: {
     color: "#000",
-    fontSize: 20
+    fontSize: 20,
   },
   KeyText: {
     color: "#000",
     fontSize: 35,
     marginTop: 80,
-    height: "30%"
+    height: "30%",
   },
   CopyText: {
     color: "#fff",
-    fontSize: 20
+    fontSize: 20,
   },
   CopyToClipboardButton: {
     width: "100%",
@@ -314,8 +314,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     shadowColor: "#000",
     shadowOpacity: 0.4,
-    textShadowOffset: { width: 0, height: 20 }
-  }
+    textShadowOffset: { width: 0, height: 20 },
+  },
 });
 
 export default CreateAccount;

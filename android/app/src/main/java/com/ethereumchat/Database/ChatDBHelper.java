@@ -259,6 +259,9 @@ public class ChatDBHelper extends SQLiteOpenHelper {
             contentValues.put(ContactEntry.COLUMN_PUBLIC_KEY,contact.getPublicKey());
             contentValues.put(ContactEntry.COLUMN_PROFILE_IN_STRING, contact.getProfileInString());
 
+            String checkExists = "SELECT count(*) FROM " + ContactEntry.TABLE_NAME + " WHERE " + ContactEntry.COLUMN_PUBLIC_KEY + " ='" + contact.getPublicKey() + "'";
+
+
             db.insert(ContactEntry.TABLE_NAME,null,contentValues);
 
             db.close();

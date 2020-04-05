@@ -44,11 +44,6 @@ export class QrScan extends Component {
         <QRCodeScanner
           onRead={this.onSuccess}
           cameraProps={{ flashMode: Camera.Constants.FlashMode.auto }}
-          bottomContent={
-            <TouchableOpacity style={styles.buttonTouchable}>
-              <Text style={styles.buttonText}>OK. Got it!</Text>
-            </TouchableOpacity>
-          }
         />
       </View>
     );
@@ -68,16 +63,19 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 21,
-    color: "#fff",
-    marginTop: 10,
+    color: "#000",
+
     width: "100%",
-    textAlign: "center",
-    backgroundColor: "#000",
-    padding: 10
+    textAlign: "center"
   },
   buttonTouchable: {
-    width: "100%",
-    padding: 16
+    width: "90%",
+    height: 65,
+    padding: 16,
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    marginLeft: 10,
+    marginRight: 10
   }
 });
 

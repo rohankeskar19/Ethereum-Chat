@@ -6,47 +6,75 @@ import {
   Image,
   TouchableOpacity,
   NativeModules,
-  FlatList
+  FlatList,
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 const EthereumChatMessagingModule = NativeModules.EthereumChatMessagingModule;
 
+function Item(item) {
+  console.log(item);
+  var contact = {}
+  if(item){
+    contact = item.contact.item;
+  }
+  return (
+    <View style={styles.ContactItem}>
+      {contact.profile_in_string == "default_image" ? (
+        <Image
+          source={require("../assets/default_profile.jpg")}
+          style={styles.ContactImage}
+        />
+      ) : (
+        <Image
+          source={{
+            uri: `data:image/gif;base64,${contact.profile_in_string}`,
+          }}
+          style={styles.ContactImage}
+        />
+      )}
+      <Text style={styles.ContactName}>{contact.name}</Text>
+    </View>
+  );
+}
+
 export class ChatList extends Component {
   state = {
     contacts: null,
-    recentChat: []
+    recentChat: [],
   };
 
   openSettings = () => {
     this.props.navigation.navigate("Settings");
   };
 
-  searchUsers = text => {
+  searchUsers = (text) => {
     if (text.trim() == "") {
       this.setState({
-        contacts: []
+        contacts: [],
       });
     } else {
       EthereumChatMessagingModule.getContacts(
         text,
-        err => {},
-        contacts => {
+        (err) => {},
+        (contacts) => {
           console.log(contacts);
           this.setState({
-            contacts: JSON.parse(contacts)
+            contacts: JSON.parse(contacts),
           });
-          console.log(this.state);
         }
       );
     }
   };
 
-  componentDidMount() {}
+  componentDidMount() {
+    // this.props.navigation.navigate("Chat");
+  }
 
   render() {
     const { contacts } = this.state;
+    // console.log(contacts);
     return (
       <View>
         <View style={styles.Header}>
@@ -68,24 +96,7 @@ export class ChatList extends Component {
           <FlatList
             style={styles.ChatList}
             data={contacts}
-            renderItem={contact => (
-              <View style={styles.ContactItem}>
-                {contact.profile_in_string == "default_image" ? (
-                  <Image
-                    source={require("../assets/default_profile.jpg")}
-                    style={styles.ContactImage}
-                  />
-                ) : (
-                  <Image
-                    source={{
-                      uri: `data:image/gif;base64,${contact.profile_in_string}`
-                    }}
-                    style={styles.ContactImage}
-                  />
-                )}
-                <Text style={styles.ContactName}>{contact.name}</Text>
-              </View>
-            )}
+            renderItem={(contact) => <Item contact={contact} />}
             keyExtractor={(contact, index) => index.toString()}
           />
           {/* {contacts &&
@@ -116,7 +127,7 @@ export class ChatList extends Component {
 const styles = StyleSheet.create({
   SettingsButton: {
     width: 30,
-    height: 30
+    height: 30,
     // marginTop: 15,
     // marginRight: 20
   },
@@ -127,23 +138,23 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#ededed",
-    padding: 15
+    padding: 15,
   },
   ChatsHeading: {
     color: "#000",
-    fontSize: 30
+    fontSize: 30,
   },
   Container: {
     width: "100%",
-    height: "100%"
+    height: "100%",
   },
   SearchBar: {
     width: "100%",
     height: 60,
     backgroundColor: "#e0e0e0",
-    borderRadius: 5,
+
     paddingHorizontal: 20,
-    fontSize: 15
+    fontSize: 15,
   },
   ContactItem: {
     width: "100%",
@@ -152,25 +163,24 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   ContactImage: {
     width: 70,
     height: 70,
-    borderRadius: 100
+    borderRadius: 100,
   },
   ContactName: {
     color: "#000",
     marginLeft: 20,
-    fontSize: 20
+    fontSize: 20,
   },
   ChatList: {
     display: "flex",
     flex: 1,
-
     width: "100%",
-    height: "100%"
-  }
+    height: "100%",
+  },
 });
 
 export default ChatList;
