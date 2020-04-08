@@ -1,209 +1,84 @@
 import React, { Component } from "react";
 import { View } from "react-native";
-import {
-  Text,
-  ScrollView,
-  StyleSheet,
-  KeyboardAvoidingView,
-  TextInput,
-  TouchableHighlight,
-  Keyboard
-} from "react-native";
-import KeyboardSpacer from "react-native-keyboard-spacer";
-import AutogrowInput from "react-native-autogrow-input";
+import { Text, FlatList, StyleSheet, Keyboard } from "react-native";
+import InputBar from "../components/InputBar";
+import MessageBubble from "../components/MessageBubble";
 
 export default class Chat extends Component {
-  constructor(props) {
-    super(props);
-
-    var messages = [];
-
-    this.state = {
-      messages: messages,
-      inputBarText: ""
-    };
-  }
-
-  static navigationOptions = {
-    title: "Chat"
+  state = {
+    messages: [],
+    inputBarText: "",
   };
 
-  componentWillMount() {
-    this.keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      this.keyboardDidShow.bind(this)
-    );
-    this.keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      this.keyboardDidHide.bind(this)
-    );
-  }
-
-  componentWillUnmount() {
-    this.keyboardDidShowListener.remove();
-    this.keyboardDidHideListener.remove();
-  }
-
-  keyboardDidShow(e) {
-    this.scrollView.scrollToEnd();
-  }
-
-  keyboardDidHide(e) {
-    this.scrollView.scrollToEnd();
-  }
-
   componentDidMount() {
-    setTimeout(
-      function() {
-        this.scrollView.scrollToEnd();
-      }.bind(this)
-    );
+    this.refs.FlatList.scrollToEnd({ animated: true });
   }
 
-  componentDidUpdate() {
-    setTimeout(
-      function() {
-        this.scrollView.scrollToEnd();
-      }.bind(this)
-    );
-  }
+  componentDidUpdate() {}
 
-  _sendMessage() {
-    this.state.messages.push({
+  sendMessage() {
+    const message = {
       direction: "right",
-      text: this.state.inputBarText
-    });
+      text: this.state.inputBarText,
+    };
 
     this.setState({
-      messages: this.state.messages,
-      inputBarText: ""
+      messages: [...this.state.messages, message],
+      inputBarText: "",
     });
   }
 
-  _onChangeInputBarText(text) {
+  onChangeInputBarText(text) {
     this.setState({
-      inputBarText: text
+      inputBarText: text,
     });
   }
 
-  _onInputSizeChange() {
-    setTimeout(
-      function() {
-        this.scrollView.scrollToEnd({ animated: false });
-      }.bind(this)
-    );
+  onInputSizeChange() {
+    this.refs.FlatList.scrollToEnd({ animated: true });
   }
+
+  MessageItem = (messageItem) => {
+    const message = messageItem.message.item;
+    return <MessageBubble direction={message.direction} text={message.text} />;
+  };
 
   render() {
-    var messages = [];
-
-    this.state.messages.forEach(function(message, index) {
-      messages.push(
-        <MessageBubble
-          key={index}
-          direction={message.direction}
-          text={message.text}
-        />
-      );
-    });
-
+    const { messages } = this.state;
+    console.log(messages);
     return (
       <View style={styles.outer}>
         <View style={styles.Header}>
           <Text style={{ color: "white" }}>Photo & Name</Text>
         </View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          ref={ref => {
-            this.scrollView = ref;
-          }}
+
+        <FlatList
+          data={messages}
           style={styles.messages}
-        >
-          {messages}
-        </ScrollView>
+          renderItem={(message) => <this.MessageItem message={message} />}
+          keyExtractor={(message, index) => index.toString()}
+          ref="FlatList"
+          onContentSizeChange={() =>
+            this.refs.FlatList.scrollToEnd({ animated: false })
+          }
+        />
         <InputBar
-          onSendPressed={() => this._sendMessage()}
-          onSizeChange={() => this._onInputSizeChange()}
-          onChangeText={text => this._onChangeInputBarText(text)}
+          onSendPressed={() => this.sendMessage()}
+          onSizeChange={() => this.onInputSizeChange()}
+          onChangeText={(text) => this.onChangeInputBarText(text)}
           text={this.state.inputBarText}
         />
-        <KeyboardSpacer />
-      </View>
-    );
-  }
-}
-
-class MessageBubble extends Component {
-  render() {
-    var leftSpacer =
-      this.props.direction === "left" ? null : <View style={{ width: 70 }} />;
-    var rightSpacer =
-      this.props.direction === "left" ? <View style={{ width: 70 }} /> : null;
-
-    var bubbleStyles =
-      this.props.direction === "left"
-        ? [styles.messageBubble, styles.messageBubbleLeft]
-        : [styles.messageBubble, styles.messageBubbleRight];
-
-    var bubbleTextStyle =
-      this.props.direction === "left"
-        ? styles.messageBubbleTextLeft
-        : styles.messageBubbleTextRight;
-
-    return (
-      <View style={{ justifyContent: "space-between", flexDirection: "row" }}>
-        {leftSpacer}
-        <View style={bubbleStyles}>
-          <Text style={bubbleTextStyle}>{this.props.text}</Text>
-        </View>
-        {rightSpacer}
-      </View>
-    );
-  }
-}
-
-class InputBar extends Component {
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.text === "") {
-      this.autogrowInput.resetInputText();
-    }
-  }
-
-  render() {
-    return (
-      <View style={styles.inputBar}>
-        <AutogrowInput
-          style={styles.textBox}
-          ref={ref => {
-            this.autogrowInput = ref;
-          }}
-          multiline={true}
-          defaultHeight={30}
-          onChangeText={text => this.props.onChangeText(text)}
-          onContentSizeChange={this.props.onSizeChange}
-          value={this.props.text}
-        />
-        <View>
-          <TouchableHighlight
-            style={styles.sendButton}
-            onPress={() => this.props.onSendPressed()}
-          >
-            <Text style={{ color: "white" }}>Send</Text>
-          </TouchableHighlight>
-        </View>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  //ChatView
-
   outer: {
     flex: 1,
     flexDirection: "column",
     justifyContent: "space-between",
-    backgroundColor: "white"
+    backgroundColor: "white",
   },
 
   Header: {
@@ -214,70 +89,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "black",
-    padding: 15
+    padding: 15,
   },
   messages: {
-    flex: 1
-  },
-
-  //InputBar
-
-  inputBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 5,
-    paddingVertical: 3
-  },
-
-  textBox: {
-    overflow: "hidden",
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: "gray",
     flex: 1,
-    fontSize: 16,
-    paddingHorizontal: 10
   },
-
-  sendButton: {
-    height: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingLeft: 15,
-    marginLeft: 5,
-    paddingRight: 15,
-    borderRadius: 15,
-    backgroundColor: "green"
-  },
-
-  //MessageBubble
-
-  messageBubble: {
-    alignItems: "flex-start",
-    borderRadius: 15,
-    marginTop: 8,
-    marginRight: 10,
-    marginLeft: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    justifyContent: "flex-start",
-    flexDirection: "row",
-    flex: 1
-  },
-
-  messageBubbleLeft: {
-    backgroundColor: "grey"
-  },
-
-  messageBubbleTextLeft: {
-    color: "black"
-  },
-
-  messageBubbleRight: {
-    backgroundColor: "black"
-  },
-
-  messageBubbleTextRight: {
-    color: "white"
-  }
 });
