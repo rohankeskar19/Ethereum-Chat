@@ -4,10 +4,66 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput
+  TextInput,
+  NativeModules
 } from "react-native";
 
+const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
+
 export class ChangePassword extends Component {
+
+  state = {
+    oldPassword: "",
+    newPassword1: "",
+    newPassword2: "",
+    error: false,
+    accountData: {}
+  };
+  
+  componentDidMount() {
+    EthereumChatAccountModule.getAccountData(
+      err => {},
+      accountData => {
+        const accountDataToShow = JSON.parse(accountData);
+        console.log(accountDataToShow.name);
+        this.setState({
+          accountData: accountDataToShow
+        });
+      }
+    );
+  }
+  
+  errorView = () =>{
+ 
+    if(this.state.status == false)
+    {
+      this.setState({status: true})
+    }
+    else
+    {
+      this.setState({status: false})
+    }
+  }
+
+  changePassword = password => {
+    const { oldPassword, newPassword1, newPassword2 } = this.state;
+    if (oldPassword == this.state.accountData.password) {
+      this.setState({
+        accountData: {
+          ...this.state.accountData,
+          password
+        }
+      });
+      this.props.navigation.navigate("ChangePassword");
+    }
+    else{
+      console.log(this.state.accountData.password);
+      this.errorView
+    }
+
+    console.log(this.state.accountData.password);
+  };
+
   render() {
     return (
       <View>
@@ -18,23 +74,48 @@ export class ChangePassword extends Component {
           <View style={styles.item}>
             <TextInput
               placeholder="Enter Current Password"
-              style={styles.ButtonText}
+              onChangeText={(oldPassword) => this.setState({ oldPassword: oldPassword })}
+              style={[
+                this.state.error == true ? styles.errorOutline : null,
+                styles.ButtonText,
+              ]}
+              secureTextEntry={true}
             ></TextInput>
           </View>
           <View style={styles.item}>
             <TextInput
               placeholder="Enter New Password"
-              style={styles.ButtonText}
+              onChangeText={(newPassword1) => this.setState({ newPassword1: newPassword1 })}
+              style={[
+                this.state.error == true ? styles.errorOutline : null,
+                styles.ButtonText,
+              ]}
+              secureTextEntry={true}
             ></TextInput>
           </View>
           <View style={styles.item}>
             <TextInput
               placeholder="Confirm Password"
-              style={styles.ButtonText}
+              onChangeText={(newPassword2) => this.setState({ newPassword2: newPassword2 })}
+              style={[
+                this.state.error == true ? styles.errorOutline : null,
+                styles.ButtonText,
+              ]}
+              secureTextEntry={true}
             ></TextInput>
           </View>
+          <View style={styles.item}>
+ 
+          {
+              // Pass any View or Component inside the curly bracket.
+              // Here the ? Question Mark represent the ternary operator.
+    
+            this.state.error ? <Text style= {{ fontSize: 25, color: "#000", textAlign: 'center' }}> ERROR</Text> : null
+          }
+          </View>
           <View>
-            <TouchableOpacity style={styles.DoneButton}>
+            <TouchableOpacity style={styles.DoneButton}
+            onPress={this.changePassword}>
               <Text style={{ color: "#fff", fontSize: 25 }}>Done</Text>
             </TouchableOpacity>
           </View>
@@ -45,6 +126,12 @@ export class ChangePassword extends Component {
 }
 
 const styles = StyleSheet.create({
+  errorOutline: {
+    borderColor: "#ba2525",
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+  },
   ChangePasswordHeader: {
     display: "flex",
     flexDirection: "row",
