@@ -206,5 +206,50 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
         }
     }
 
+    @ReactMethod 
+    public void getPassword(Callback err,Callback success){
+        SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
+        String password = sharedPreferences.getString("password","nodata");
+
+        if(password.equals("nodata")){
+            err.invoke("error occured");
+        }
+        else{
+            try{
+                JSONObject accountData = new JSONObject();
+
+                accountData.put("password",password);
+
+
+                success.invoke(accountData.toString());
+            }
+            catch (Exception e){
+                e.printStackTrace();
+                err.invoke("error occured");
+            }
+
+        }
+
+    }
+
+    @ReactMethod
+    public void changePassword(String newPassword,Callback err,Callback success){
+        try{
+            JSONObject accountData = new JSONObject(newPassword);
+
+            String password = accountData.getString("password");
+
+            SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("password",password);
+            editor.commit();
+            success.invoke("updated_profile");
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            err.invoke("error occured while updating password");
+        }
+    }
 
 }

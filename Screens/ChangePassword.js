@@ -7,6 +7,7 @@ import {
   TextInput,
   NativeModules
 } from "react-native";
+import { StackActions, NavigationActions } from "react-navigation";
 
 const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 
@@ -21,11 +22,11 @@ export class ChangePassword extends Component {
   };
   
   componentDidMount() {
-    EthereumChatAccountModule.getAccountData(
+    EthereumChatAccountModule.getPassword(
       err => {},
       accountData => {
         const accountDataToShow = JSON.parse(accountData);
-        console.log(accountDataToShow.name);
+        console.log(accountDataToShow.password);
         this.setState({
           accountData: accountDataToShow
         });
@@ -33,36 +34,34 @@ export class ChangePassword extends Component {
     );
   }
   
-  errorView = () =>{
- 
-    if(this.state.status == false)
-    {
-      this.setState({status: true})
-    }
-    else
-    {
-      this.setState({status: false})
-    }
-  }
+  onSubmitEdit = () => {
+    const { accountData ,oldPassword, newPassword1, newPassword2} = this.state;
 
-  changePassword = password => {
-    const { oldPassword, newPassword1, newPassword2 } = this.state;
-    if (oldPassword == this.state.accountData.password) {
-      this.setState({
-        accountData: {
-          ...this.state.accountData,
-          password
+    console.log(accountData.password);
+    if (oldPassword == this.state.accountData.password && newPassword1==newPassword2) {
+      this.state.accountData.password=newPassword1;
+      EthereumChatAccountModule.changePassword(
+        JSON.stringify(accountData),
+        err => {},
+        success => {
+          console.log("Changed Password");
+          this.props.navigation.dispatch({
+            ...StackActions.reset({
+              index: 0,
+              actions: [NavigationActions.navigate({ routeName: "Settings" })]
+            })
+          });
         }
-      });
-      this.props.navigation.navigate("ChangePassword");
+      );
+      console.log(this.state.accountData.password);
     }
     else{
-      console.log(this.state.accountData.password);
       this.errorView
+      this.setState({error: true})
+      console.log("ERROR")
     }
-
-    console.log(this.state.accountData.password);
   };
+
 
   render() {
     return (
@@ -80,6 +79,7 @@ export class ChangePassword extends Component {
                 styles.ButtonText,
               ]}
               secureTextEntry={true}
+              
             ></TextInput>
           </View>
           <View style={styles.item}>
@@ -104,7 +104,7 @@ export class ChangePassword extends Component {
               secureTextEntry={true}
             ></TextInput>
           </View>
-          <View style={styles.item}>
+          <View>
  
           {
               // Pass any View or Component inside the curly bracket.
@@ -115,7 +115,7 @@ export class ChangePassword extends Component {
           </View>
           <View>
             <TouchableOpacity style={styles.DoneButton}
-            onPress={this.changePassword}>
+            onPress={this.onSubmitEdit}>
               <Text style={{ color: "#fff", fontSize: 25 }}>Done</Text>
             </TouchableOpacity>
           </View>
