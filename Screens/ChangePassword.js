@@ -4,10 +4,65 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput
+  TextInput,
+  NativeModules
 } from "react-native";
+import { StackActions, NavigationActions } from "react-navigation";
+
+const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 
 export class ChangePassword extends Component {
+
+  state = {
+    oldPassword: "",
+    newPassword1: "",
+    newPassword2: "",
+    error: false,
+    accountData: {}
+  };
+  
+  componentDidMount() {
+    EthereumChatAccountModule.getPassword(
+      err => {},
+      accountData => {
+        const accountDataToShow = JSON.parse(accountData);
+        console.log(accountDataToShow.password);
+        this.setState({
+          accountData: accountDataToShow
+        });
+      }
+    );
+  }
+  
+  onSubmitEdit = () => {
+    const { accountData ,oldPassword, newPassword1, newPassword2} = this.state;
+
+    console.log(accountData.password);
+    if (oldPassword == this.state.accountData.password && newPassword1==newPassword2) {
+      this.state.accountData.password=newPassword1;
+      EthereumChatAccountModule.changePassword(
+        JSON.stringify(accountData),
+        err => {},
+        success => {
+          console.log("Changed Password");
+          this.props.navigation.dispatch({
+            ...StackActions.reset({
+              index: 0,
+              actions: [NavigationActions.navigate({ routeName: "Settings" })]
+            })
+          });
+        }
+      );
+      console.log(this.state.accountData.password);
+    }
+    else{
+      this.errorView
+      this.setState({error: true})
+      console.log("ERROR")
+    }
+  };
+
+
   render() {
     return (
       <View>
@@ -18,23 +73,49 @@ export class ChangePassword extends Component {
           <View style={styles.item}>
             <TextInput
               placeholder="Enter Current Password"
-              style={styles.ButtonText}
+              onChangeText={(oldPassword) => this.setState({ oldPassword: oldPassword })}
+              style={[
+                this.state.error == true ? styles.errorOutline : null,
+                styles.ButtonText,
+              ]}
+              secureTextEntry={true}
+              
             ></TextInput>
           </View>
           <View style={styles.item}>
             <TextInput
               placeholder="Enter New Password"
-              style={styles.ButtonText}
+              onChangeText={(newPassword1) => this.setState({ newPassword1: newPassword1 })}
+              style={[
+                this.state.error == true ? styles.errorOutline : null,
+                styles.ButtonText,
+              ]}
+              secureTextEntry={true}
             ></TextInput>
           </View>
           <View style={styles.item}>
             <TextInput
               placeholder="Confirm Password"
-              style={styles.ButtonText}
+              onChangeText={(newPassword2) => this.setState({ newPassword2: newPassword2 })}
+              style={[
+                this.state.error == true ? styles.errorOutline : null,
+                styles.ButtonText,
+              ]}
+              secureTextEntry={true}
             ></TextInput>
           </View>
           <View>
-            <TouchableOpacity style={styles.DoneButton}>
+ 
+          {
+              // Pass any View or Component inside the curly bracket.
+              // Here the ? Question Mark represent the ternary operator.
+    
+            this.state.error ? <Text style= {{ fontSize: 25, color: "#000", textAlign: 'center' }}> ERROR</Text> : null
+          }
+          </View>
+          <View>
+            <TouchableOpacity style={styles.DoneButton}
+            onPress={this.onSubmitEdit}>
               <Text style={{ color: "#fff", fontSize: 25 }}>Done</Text>
             </TouchableOpacity>
           </View>
@@ -45,6 +126,12 @@ export class ChangePassword extends Component {
 }
 
 const styles = StyleSheet.create({
+  errorOutline: {
+    borderColor: "#ba2525",
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+  },
   ChangePasswordHeader: {
     display: "flex",
     flexDirection: "row",
