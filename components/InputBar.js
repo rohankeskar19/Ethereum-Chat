@@ -1,12 +1,6 @@
 import React, { Component } from "react";
 import AutogrowInput from "react-native-autogrow-input";
-import {
-  View,
-  Text,
-  TouchableHighlight,
-  StyleSheet,
-  TextInput,
-} from "react-native";
+import { View, Text, TouchableHighlight, StyleSheet } from "react-native";
 class InputBar extends Component {
   componentDidUpdate(prevPros, prevState, snap) {
     if (this.props.text == "") {

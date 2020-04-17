@@ -1,26 +1,38 @@
 import React, { Component } from "react";
 import { View } from "react-native";
-import { Text, FlatList, StyleSheet, Keyboard } from "react-native";
+import { Text, FlatList, StyleSheet, NativeModules } from "react-native";
 import InputBar from "../components/InputBar";
 import MessageBubble from "../components/MessageBubble";
+
+const EthereumChatMessagingModule = NativeModules.EthereumChatMessagingModule
 
 export default class Chat extends Component {
   state = {
     messages: [],
     inputBarText: "",
+    contact: {}
   };
 
   componentDidMount() {
+
+    const contact = this.props.navigation.getParam("contact", "null");
+    this.setState({
+      contact
+    })
     this.refs.FlatList.scrollToEnd({ animated: true });
   }
 
-  componentDidUpdate() {}
+  componentDidUpdate() { }
 
   sendMessage() {
     const message = {
       direction: "right",
       text: this.state.inputBarText,
     };
+
+    const { contact } = this.state;
+
+    EthereumChatMessagingModule.postMessage(message.text, contact.public_key)
 
     this.setState({
       messages: [...this.state.messages, message],

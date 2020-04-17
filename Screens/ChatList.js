@@ -19,6 +19,15 @@ export class ChatList extends Component {
     recentChat: [],
   };
 
+  componentDidMount() {
+    console.log("object")
+    EthereumChatMessagingModule.subscribeMessages((newMessage) => {
+      console.log(success)
+    }, err => {
+      console.log(err)
+    });
+  }
+
   Item = (item) => {
     var contact = {};
     if (item) {
@@ -36,20 +45,20 @@ export class ChatList extends Component {
             style={styles.ContactImage}
           />
         ) : (
-          <Image
-            source={{
-              uri: `data:image/gif;base64,${contact.profile_in_string}`,
-            }}
-            style={styles.ContactImage}
-          />
-        )}
+            <Image
+              source={{
+                uri: `data:image/gif;base64,${contact.profile_in_string}`,
+              }}
+              style={styles.ContactImage}
+            />
+          )}
         <Text style={styles.ContactName}>{contact.name}</Text>
       </TouchableOpacity>
     );
   };
 
   navigate = (contact) => {
-    this.props.navigation.navigate("Chat");
+    this.props.navigation.navigate("Chat", { contact: contact });
     console.log("clicked");
   };
 
@@ -65,8 +74,9 @@ export class ChatList extends Component {
     } else {
       EthereumChatMessagingModule.getContacts(
         text,
-        (err) => {},
+        (err) => { },
         (contacts) => {
+
           this.setState({
             contacts: JSON.parse(contacts),
           });
@@ -75,9 +85,7 @@ export class ChatList extends Component {
     }
   };
 
-  componentDidMount() {
-    // this.props.navigation.navigate("Chat");
-  }
+
 
   render() {
     const { contacts } = this.state;

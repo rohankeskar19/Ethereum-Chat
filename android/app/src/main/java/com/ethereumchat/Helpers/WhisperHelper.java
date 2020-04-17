@@ -1,9 +1,13 @@
 package com.ethereumchat.Helpers;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.ethereum.geth.Context;
+import org.ethereum.geth.Criteria;
 import org.ethereum.geth.Geth;
+import org.ethereum.geth.Message;
+import org.ethereum.geth.NewMessageHandler;
 import org.ethereum.geth.WhisperClient;
 
 import java.nio.charset.StandardCharsets;
@@ -56,6 +60,45 @@ public class WhisperHelper {
         return "error";
 
     }
+
+    public static String getPrivateKey(String keyPair){
+        try{
+            Log.d(TAG, "getPrivateKey: " + keyPair);
+            Context context = Geth.newContext();
+
+            WhisperClient whisperClient = ClientHolder.getWhisperClient();
+
+            byte[] key = whisperClient.getPrivateKey(context,keyPair);
+            String privateKey = "";
+
+
+            privateKey = bytesToHexString(key);
+
+            String[] temp = privateKey.split("");
+
+            List<String> temp1 = Arrays.asList(temp);
+
+            ArrayList<String> temp2 = new ArrayList<>(temp1);
+
+            temp2.add(2,"x");
+            privateKey = "";
+            for(String s : temp2){
+                privateKey += s;
+            }
+
+
+
+            Log.d(TAG, "getPrivateKey: " + privateKey);
+            return privateKey;
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return "error";
+
+    }
+
+
 
     public static String bytesToHexString(final byte... bytes) {
         if (bytes == null || bytes.length == 0) {

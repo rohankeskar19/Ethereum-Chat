@@ -16,7 +16,11 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 
 import org.ethereum.geth.Context;
+import org.ethereum.geth.Criteria;
 import org.ethereum.geth.Geth;
+import org.ethereum.geth.Message;
+import org.ethereum.geth.NewMessage;
+import org.ethereum.geth.NewMessageHandler;
 import org.ethereum.geth.WhisperClient;
 import org.json.JSONObject;
 
@@ -57,6 +61,9 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
 
 
             successCallback.invoke(keyPair);
+
+
+
 
 
         }

@@ -10,7 +10,6 @@ import {
   Text,
   TextInput,
 } from "react-native";
-import { StackActions, NavigationActions } from "react-navigation";
 
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
@@ -27,22 +26,6 @@ class CreateAccount extends Component {
     keyPairCopied: false,
     progressXPos: new Animated.Value(0),
   };
-
-  // componentDidMount() {
-  //   EthereumChatAccountModule.checkAccountCreated(
-  //     err => {},
-  //     created => {
-  //       this.props.navigation.dispatch({
-  //         ...StackActions.reset({
-  //           index: 0,
-  //           actions: [
-  //             NavigationActions.navigate({ routeName: "SelectProfileImage" })
-  //           ]
-  //         })
-  //       });
-  //     }
-  //   );
-  // }
 
   handleCreateAccount = () => {
     const { name, password } = this.state;
