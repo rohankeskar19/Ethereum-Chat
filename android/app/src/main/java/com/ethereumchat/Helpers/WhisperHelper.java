@@ -43,7 +43,7 @@ public class WhisperHelper {
 
             ArrayList<String> temp2 = new ArrayList<>(temp1);
 
-            temp2.add(2,"x");
+            temp2.add(2,"x0");
             publicKey = "";
             for(String s : temp2){
                 publicKey += s;
@@ -80,7 +80,7 @@ public class WhisperHelper {
 
             ArrayList<String> temp2 = new ArrayList<>(temp1);
 
-            temp2.add(2,"x");
+            temp2.add(2,"x0");
             privateKey = "";
             for(String s : temp2){
                 privateKey += s;

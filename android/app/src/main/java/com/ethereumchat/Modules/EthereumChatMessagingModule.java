@@ -112,27 +112,51 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
 
           Context context = Geth.newContext();
 
+          String publicKey = WhisperHelper.getPublicKey(keyPair);
 
 
-          Criteria criteria = Geth.newCriteria(keyPair.getBytes());
+          Criteria criteria = Geth.newCriteria(publicKey.getBytes());
 
 
           criteria.setPrivateKeyID(keyPair);
-
-          whisperClient.subscribeMessages(context, criteria, new NewMessageHandler() {
+          new Thread(new Runnable() {
               @Override
-              public void onError(String s) {
-                  Log.d(TAG, "onError: " + s);
-              }
+              public void run() {
+                  try{
+                      Log.d(TAG, "run: executed");
+                      NewMessageHandler messageHandler = new NewMessageHandler() {
+                          @Override
+                          public void onError(String s) {
 
-              @Override
-              public void onNewMessage(Message message) {
-                  String newMessage = new String(message.getPayload());
-                  Log.d(TAG, "onNewMessage: " + newMessage);
-                  newMessageCallback.invoke(newMessage);
-              }
-          },10);
+                          }
 
+                          @Override
+                          public void onNewMessage(Message message) {
+                              String newMessage = new String(message.getPayload());
+                              System.out.println("New message arrived! " + newMessage);
+                              Log.d(TAG, "onNewMessage: " + newMessage);
+                              
+                          }
+                      };
+
+
+                      whisperClient.subscribeMessages(context, criteria, messageHandler,1000);
+
+                  }
+                  catch (Exception e){
+                      e.printStackTrace();
+                  }
+
+              }
+          }).run();
+
+
+
+
+
+
+
+          newMessageCallback.invoke("success");
       }
       catch (Exception e){
           error.invoke("error occured");

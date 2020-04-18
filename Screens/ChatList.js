@@ -22,7 +22,7 @@ export class ChatList extends Component {
   componentDidMount() {
     console.log("object")
     EthereumChatMessagingModule.subscribeMessages((newMessage) => {
-      console.log(success)
+      console.log(newMessage)
     }, err => {
       console.log(err)
     });
