@@ -135,6 +135,8 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
                               String newMessage = new String(message.getPayload());
                               System.out.println("New message arrived! " + newMessage);
                               Log.d(TAG, "onNewMessage: " + newMessage);
+
+
                               
                           }
                       };
