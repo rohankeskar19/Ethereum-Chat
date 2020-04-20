@@ -3,17 +3,16 @@ package com.ethereumchat.Helpers;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import org.ethereum.geth.Context;
-import org.ethereum.geth.Criteria;
-import org.ethereum.geth.Geth;
-import org.ethereum.geth.Message;
-import org.ethereum.geth.NewMessageHandler;
-import org.ethereum.geth.WhisperClient;
+
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import geth.Context;
+import geth.Geth;
+import geth.WhisperClient;
 
 public class WhisperHelper {
 
@@ -100,6 +99,7 @@ public class WhisperHelper {
 
 
 
+
     public static String bytesToHexString(final byte... bytes) {
         if (bytes == null || bytes.length == 0) {
             return "";
@@ -111,5 +111,38 @@ public class WhisperHelper {
             hexChars[j * 2 + 1] = HEX_ARRAY[v & MASK_SECOND_TUPLE];
         }
         return new String(hexChars);
+    }
+
+    public static byte[] hexStringToByteArray(String s) {
+        Log.d(TAG, "hexStringToByteArray: " + s);
+        Log.d(TAG, "hexStringToByteArray: " + s.length());
+        s = s.substring(2,s.length());
+        Log.d(TAG, "hexStringToByteArray: " + s);
+        int len = s.length();
+        Log.d(TAG, "hexStringToByteArray: " + s.length());
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
+    }
+
+    public static byte[] getByteArray(String str) {
+        if (!"0x".equals(str.substring(0,2))) {
+            return null; // or throw some exception
+        } else {
+            String tmp = str.substring(2, str.length()-2);
+            int bytes = tmp.length() / 2;
+            byte[] array = new byte[bytes];
+
+            for (int i = 0; i < bytes; i++) {
+                byte b = (byte) ((Character.digit(tmp.charAt(i*2), 16) << 4)
+                        + Character.digit(tmp.charAt(i*2+1), 16));
+                array[i] = b;
+            }
+
+            return array;
+        }
     }
 }

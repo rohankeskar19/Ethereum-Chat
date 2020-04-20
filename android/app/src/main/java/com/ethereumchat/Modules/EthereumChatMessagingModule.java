@@ -4,11 +4,14 @@ import android.accounts.AccountManager;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.HandlerThread;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.ethereumchat.Database.ChatContract;
 import com.ethereumchat.Database.ChatDBHelper;
@@ -21,21 +24,20 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 
-import org.ethereum.geth.Context;
-import org.ethereum.geth.Criteria;
-import org.ethereum.geth.Geth;
-import org.ethereum.geth.KeyStore;
-import org.ethereum.geth.Message;
-import org.ethereum.geth.Messages;
-import org.ethereum.geth.NewMessage;
-import org.ethereum.geth.NewMessageHandler;
-import org.ethereum.geth.Node;
-import org.ethereum.geth.NodeConfig;
-import org.ethereum.geth.WhisperClient;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.ethereumchat.Database.ChatDBHelper.*;
+
+import geth.Context;
+import geth.Criteria;
+import geth.Geth;
+import geth.Message;
+import geth.NewMessage;
+import geth.NewMessageHandler;
+import geth.Subscription;
+import geth.WhisperClient;
 
 
 public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
@@ -76,9 +78,12 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void postMessage(String message,String publicKey){
         try{
+            publicKey = publicKey.substring(2,publicKey.length());
+
             NewMessage message1 = Geth.newNewMessage();
+
             message1.setPayload(message.getBytes());
-            message1.setPublicKey(publicKey.getBytes());
+            message1.setPublicKey(publicKey);
             message1.setTTL(60);
             message1.setPowTime(2);
             message1.setPowTarget(2.5);
@@ -115,15 +120,20 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
           String publicKey = WhisperHelper.getPublicKey(keyPair);
 
 
-          Criteria criteria = Geth.newCriteria(publicKey.getBytes());
+          Criteria criteria = Geth.newCriteria("Ethereum Chat".getBytes());
 
 
           criteria.setPrivateKeyID(keyPair);
+
+
+
           new Thread(new Runnable() {
               @Override
               public void run() {
                   try{
                       Log.d(TAG, "run: executed");
+
+
                       NewMessageHandler messageHandler = new NewMessageHandler() {
                           @Override
                           public void onError(String s) {
@@ -137,12 +147,14 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
                               Log.d(TAG, "onNewMessage: " + newMessage);
 
 
-                              
+
                           }
                       };
 
-
                       whisperClient.subscribeMessages(context, criteria, messageHandler,1000);
+
+
+
 
                   }
                   catch (Exception e){
@@ -150,7 +162,9 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
                   }
 
               }
-          }).run();
+          }).start();
+
+
 
 
 

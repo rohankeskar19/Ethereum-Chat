@@ -26,6 +26,8 @@ export class ChatList extends Component {
     }, err => {
       console.log(err)
     });
+
+
   }
 
   Item = (item) => {

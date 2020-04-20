@@ -2,9 +2,9 @@ package com.ethereumchat.Helpers;
 
 import android.util.Log;
 
-import org.ethereum.geth.Context;
-import org.ethereum.geth.Geth;
-import org.ethereum.geth.WhisperClient;
+import geth.Geth;
+import geth.WhisperClient;
+
 
 public class ClientHolder  {
 
@@ -15,7 +15,7 @@ public class ClientHolder  {
         if(whisperClient == null){
             try{
 
-                whisperClient = Geth.newWhisperClient("ws://13.233.131.121:8546");
+                whisperClient = Geth.newWhisperClient("ws://13.235.80.102:8546");
 
                 return whisperClient;
             }
