@@ -12,10 +12,17 @@ import androidx.annotation.NonNull;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import com.ethereumchat.Database.ChatContract;
 import com.ethereumchat.Database.ChatDBHelper;
-import com.ethereumchat.Helpers.ClientHolder;
+
+
+
+import com.ethereumchat.Helpers.EthereumWebSocketListener;
+import com.ethereumchat.Helpers.RequestTask;
+import com.ethereumchat.Helpers.WhisperAsyncRequestHandler;
 import com.ethereumchat.Helpers.WhisperHelper;
 import com.ethereumchat.Models.Contact;
 import com.facebook.react.bridge.Callback;
@@ -30,20 +37,41 @@ import org.json.JSONObject;
 
 import com.ethereumchat.Database.ChatDBHelper.*;
 
-import geth.Context;
-import geth.Criteria;
-import geth.Geth;
-import geth.Message;
-import geth.NewMessage;
-import geth.NewMessageHandler;
-import geth.Subscription;
-import geth.WhisperClient;
+
+import okhttp3.Dispatcher;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.WebSocket;
 
 
-public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
+public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
 
     private static final String TAG = "EthereumChatMessagingMo";
 
+
+
+    public void establishConnection(String privateKeyID){
+        try{
+            Log.d(TAG, "establishConnection: " + privateKeyID);
+
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder().url(
+                    "ws://" + WhisperHelper.ip + ":" + WhisperHelper.wsPort
+            ).build();
+
+            EthereumWebSocketListener ethereumWebSocketListener = new EthereumWebSocketListener();
+            WebSocket ws = client.newWebSocket(request,ethereumWebSocketListener);
+            JSONObject subscribeRequest = new JSONObject("{\"jsonrpc\":\"2.0\",\"method\":\"shh_subscribe\",\"params\":[\"messages\", { \"privateKeyID\": \"" + privateKeyID + "\", \"pow\": 12.3 }],\"id\":1}");
+            ws.send(subscribeRequest.toString());
+
+            client.dispatcher().executorService().shutdown();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+    }
 
     public EthereumChatMessagingModule(@NonNull ReactApplicationContext reactContext) {
         super(reactContext);
@@ -78,21 +106,13 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void postMessage(String message,String publicKey){
         try{
-            publicKey = publicKey.substring(2,publicKey.length());
 
-            NewMessage message1 = Geth.newNewMessage();
+            String cmd = "{\"jsonrpc\":\"2.0\",\"method\":\"shh_post\",\"params\":[{ \"pubKey\": \"" + publicKey + "\", \"ttl\": 7, \"powTarget\": 2.01, \"powTime\": 2, \"payload\": \"0x" + WhisperHelper.toHex(message) + "\" }],\"id\":1}";
+            JSONObject request = new JSONObject(cmd);
+            Log.d(TAG, "postMessage: " + WhisperHelper.toHex(publicKey));
+            Log.d(TAG, "postMessage: " + cmd);
+            new WhisperAsyncRequestHandler(null,null,null).execute(request,null,null);
 
-            message1.setPayload(message.getBytes());
-            message1.setPublicKey(publicKey);
-            message1.setTTL(60);
-            message1.setPowTime(2);
-            message1.setPowTarget(2.5);
-
-            WhisperClient whisperClient = ClientHolder.getWhisperClient();
-
-            Context context = Geth.newContext();
-
-            whisperClient.post(context,message1);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -110,69 +130,19 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule {
           String keyPair = sharedPreferences.getString("key_pair","null");
 
           if (keyPair.equals("null")){
+              error.invoke("error");
               return;
           }
-
-          WhisperClient whisperClient = ClientHolder.getWhisperClient();
-
-          Context context = Geth.newContext();
-
-          String publicKey = WhisperHelper.getPublicKey(keyPair);
-
-
-          Criteria criteria = Geth.newCriteria("Ethereum Chat".getBytes());
-
-
-          criteria.setPrivateKeyID(keyPair);
-
-
-
-          new Thread(new Runnable() {
-              @Override
-              public void run() {
-                  try{
-                      Log.d(TAG, "run: executed");
-
-
-                      NewMessageHandler messageHandler = new NewMessageHandler() {
-                          @Override
-                          public void onError(String s) {
-
-                          }
-
-                          @Override
-                          public void onNewMessage(Message message) {
-                              String newMessage = new String(message.getPayload());
-                              System.out.println("New message arrived! " + newMessage);
-                              Log.d(TAG, "onNewMessage: " + newMessage);
-
-
-
-                          }
-                      };
-
-                      whisperClient.subscribeMessages(context, criteria, messageHandler,1000);
-
-
-
-
-                  }
-                  catch (Exception e){
-                      e.printStackTrace();
-                  }
-
-              }
-          }).start();
+          else{
+              establishConnection(keyPair);
+              newMessageCallback.invoke("success");
+          }
 
 
 
 
 
 
-
-
-
-          newMessageCallback.invoke("success");
       }
       catch (Exception e){
           error.invoke("error occured");

@@ -10,9 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import geth.Context;
-import geth.Geth;
-import geth.WhisperClient;
 
 public class WhisperHelper {
 
@@ -22,82 +19,12 @@ public class WhisperHelper {
     private static final int MASK_SECOND_TUPLE = 0x0F;
     private static final int SHIFT_FIRST_TUPLE = 4;
 
+    public static final String ip = "13.233.160.139";
+    public static final String rpcPort = "8545";
+    public static final String wsPort = "8546";
+
+
     private static final String TAG = "WhisperHelper";
-    public static String getPublicKey(String keyPair){
-        try{
-            Log.d(TAG, "getPublicKey: " + keyPair);
-            Context context = Geth.newContext();
-
-            WhisperClient whisperClient = ClientHolder.getWhisperClient();
-
-            byte[] key = whisperClient.getPublicKey(context,keyPair);
-            String publicKey = "";
-
-
-            publicKey = bytesToHexString(key);
-
-            String[] temp = publicKey.split("");
-
-            List<String> temp1 = Arrays.asList(temp);
-
-            ArrayList<String> temp2 = new ArrayList<>(temp1);
-
-            temp2.add(2,"x0");
-            publicKey = "";
-            for(String s : temp2){
-                publicKey += s;
-            }
-
-
-
-            Log.d(TAG, "getPublicKey: " + publicKey);
-            return publicKey;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return "error";
-
-    }
-
-    public static String getPrivateKey(String keyPair){
-        try{
-            Log.d(TAG, "getPrivateKey: " + keyPair);
-            Context context = Geth.newContext();
-
-            WhisperClient whisperClient = ClientHolder.getWhisperClient();
-
-            byte[] key = whisperClient.getPrivateKey(context,keyPair);
-            String privateKey = "";
-
-
-            privateKey = bytesToHexString(key);
-
-            String[] temp = privateKey.split("");
-
-            List<String> temp1 = Arrays.asList(temp);
-
-            ArrayList<String> temp2 = new ArrayList<>(temp1);
-
-            temp2.add(2,"x0");
-            privateKey = "";
-            for(String s : temp2){
-                privateKey += s;
-            }
-
-
-
-            Log.d(TAG, "getPrivateKey: " + privateKey);
-            return privateKey;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return "error";
-
-    }
-
-
 
 
     public static String bytesToHexString(final byte... bytes) {
@@ -145,4 +72,18 @@ public class WhisperHelper {
             return array;
         }
     }
+
+    public static String toHex(String str) {
+        StringBuffer sb = new StringBuffer();
+        //Converting string to character array
+        char ch[] = str.toCharArray();
+        for(int i = 0; i < ch.length; i++) {
+            String hexString = Integer.toHexString(ch[i]);
+            sb.append(hexString);
+        }
+        String result = sb.toString();
+        return result;
+    }
+
+
 }

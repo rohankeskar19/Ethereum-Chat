@@ -6,8 +6,11 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.ethereumchat.Database.ChatDBHelper;
-import com.ethereumchat.Helpers.ClientHolder;
+
 import com.ethereumchat.Helpers.CompressionHandler;
+import com.ethereumchat.Helpers.EthereumWebSocketListener;
+import com.ethereumchat.Helpers.RequestTask;
+import com.ethereumchat.Helpers.WhisperAsyncRequestHandler;
 import com.ethereumchat.Helpers.WhisperHelper;
 import com.ethereumchat.Models.Contact;
 import com.facebook.react.bridge.Callback;
@@ -18,15 +21,83 @@ import com.facebook.react.bridge.ReactMethod;
 
 import org.json.JSONObject;
 
-import geth.Context;
-import geth.Geth;
-import geth.WhisperClient;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.WebSocket;
 
 
-public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
+public class EthereumChatAccountModule extends ReactContextBaseJavaModule implements RequestTask {
 
     private static final String TAG = "EthereumChatAccountModu";
 
+    @Override
+    public void onResponse(JSONObject response, String method,JSONObject data,Callback callback) {
+        try{
+            switch (method){
+                case "shh_newKeyPair":
+                    String privateKeyID = response.getString("result");
+                    SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+
+
+                    editor.putString("name",data.getString("name"));
+                    editor.putString("password",data.getString("password"));
+                    editor.putString("key_pair",privateKeyID);
+
+                    editor.commit();
+                    callback.invoke(privateKeyID);
+                    establishConnection(privateKeyID);
+                    String cmd = "{\"jsonrpc\":\"2.0\",\"method\":\"shh_getPublicKey\",\"params\":[\"" + privateKeyID + "\"],\"id\":1}";
+                    JSONObject request = new JSONObject(cmd);
+                    new WhisperAsyncRequestHandler(this,null,null).execute(request,null,null);
+                    break;
+                case "shh_getPublicKey":
+                    SharedPreferences sharedPreferences1 = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
+
+                    SharedPreferences.Editor editor1 = sharedPreferences1.edit();
+                    String publicKey = response.getString("result");
+                    editor1.putString("public_key",publicKey);
+
+                    editor1.commit();
+                    break;
+                default:
+                    break;
+            }
+
+            Log.d(TAG, "onResponse: " + response.toString());
+
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public void establishConnection(String privateKeyID){
+        try{
+            Log.d(TAG, "establishConnection: " + privateKeyID);
+
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder().url(
+                    "ws://" + WhisperHelper.ip + ":" + WhisperHelper.wsPort
+            ).build();
+
+            EthereumWebSocketListener ethereumWebSocketListener = new EthereumWebSocketListener();
+            WebSocket ws = client.newWebSocket(request,ethereumWebSocketListener);
+            JSONObject subscribeRequest = new JSONObject("{\"jsonrpc\":\"2.0\",\"method\":\"shh_subscribe\",\"params\":[\"messages\", { \"privateKeyID\": \"" + privateKeyID + "\", \"pow\": 12.3 }],\"id\":1}");
+            ws.send(subscribeRequest.toString());
+
+            client.dispatcher().executorService().shutdown();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+    }
 
     public EthereumChatAccountModule(@NonNull ReactApplicationContext reactContext) {
         super(reactContext);
@@ -41,24 +112,16 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void createAccount( String name,String password,Callback errorCallback,Callback successCallback){
         try{
-            WhisperClient whisperClient = ClientHolder.getWhisperClient();
 
-            Context context = Geth.newContext();
+            String cmd = "{\"jsonrpc\":\"2.0\",\"method\":\"shh_newKeyPair\",\"id\":1}";
 
-            String keyPair = whisperClient.newKeyPair(context);
+            JSONObject request = new JSONObject(cmd);
+            JSONObject data = new JSONObject();
+            data.put("name",name);
+            data.put("password",password);
 
-            SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
+            new WhisperAsyncRequestHandler(this,successCallback,data).execute(request,null,null);
 
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-
-            editor.putString("name",name);
-            editor.putString("password",password);
-            editor.putString("key_pair",keyPair);
-
-            editor.commit();
-
-
-            successCallback.invoke(keyPair);
 
 
 
@@ -119,9 +182,9 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
     public void getQRCodeData(Callback err, Callback success){
         SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
         String name = sharedPreferences.getString("name","nodata");
-        String keyPair = sharedPreferences.getString("key_pair","nodata");
+        String publicKey = sharedPreferences.getString("public_key","nodata");
 
-        if(name.equals("nodata")|| keyPair.equals("nodata")){
+        if(name.equals("nodata")|| publicKey.equals("nodata")){
             err.invoke("error occured");
         }
         else{
@@ -129,11 +192,9 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule {
                 JSONObject qrCodeData = new JSONObject();
 
                 qrCodeData.put("name",name);
-
-//                qrCodeData.put("profile_image",finalImage);
-                String publicKey = WhisperHelper.getPublicKey(keyPair);
-                Log.d(TAG, "getQRCodeData: " + publicKey);
                 qrCodeData.put("public_key",publicKey);
+//                qrCodeData.put("profile_image",finalImage);
+
 
                 success.invoke(qrCodeData.toString());
             }
