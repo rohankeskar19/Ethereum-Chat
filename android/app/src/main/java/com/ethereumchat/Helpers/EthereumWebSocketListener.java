@@ -1,10 +1,21 @@
 package com.ethereumchat.Helpers;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import com.ethereumchat.Database.ChatContract;
+import com.ethereumchat.Database.ChatDBHelper;
+import com.ethereumchat.Models.Message;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactMethod;
 
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
+
+import javax.annotation.Nullable;
 
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -16,6 +27,17 @@ public class EthereumWebSocketListener extends WebSocketListener {
 
     private static final String TAG = "EthereumWebSocketListen";
 
+    private final @Nullable ReactApplicationContext mReactApplicationContext;
+
+    public EthereumWebSocketListener() {
+        mReactApplicationContext = null;
+    }
+
+    public EthereumWebSocketListener(@Nullable ReactApplicationContext reactContext) {
+        mReactApplicationContext = reactContext;
+    }
+
+
 
     @Override
     public void onOpen(WebSocket webSocket, Response response) {
@@ -24,6 +46,7 @@ public class EthereumWebSocketListener extends WebSocketListener {
     }
 
     @Override
+    @ReactMethod
     public void onMessage(WebSocket webSocket, String text) {
         super.onMessage(webSocket, text);
         try{
@@ -38,7 +61,21 @@ public class EthereumWebSocketListener extends WebSocketListener {
                         String payload = result.getString("payload");
                         byte[] bytes = WhisperHelper.hexStringToByteArray(payload);
                         String message = new String(bytes, StandardCharsets.UTF_8);
+                        JSONObject messages = response.getJSONObject("message");
+                        JSONObject public_key = messages.getJSONObject("public_key");
                         Log.d(TAG, "onMessage: " + message);
+
+                        Message msg = new Message(messages);
+
+                        ChatDBHelper chatDBHelper = new ChatDBHelper(mReactApplicationContext);
+
+                        if(chatDBHelper.addMessage(msg)){
+
+                            success.invoke("saved message");
+                        }
+                        else{
+                            err.invoke("error");
+                        }
 
                         break;
                     default:
