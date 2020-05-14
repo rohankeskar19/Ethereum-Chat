@@ -212,9 +212,9 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(MessageEntry.COLUMN_NAME, message.getName());
+
         contentValues.put(MessageEntry.COLUMN_TIMESTAMP,message.getTimestamp());
-        contentValues.put(MessageEntry.COLUMN_IS_IMAGE,message.getIsImage());
+        contentValues.put(MessageEntry.COLUMN_IS_IMAGE,message.getImage());
         contentValues.put(MessageEntry.COLUMN_MESSAGE,message.getMessage());
         contentValues.put(MessageEntry.COLUMN_FROM_PUBLIC_KEY,message.getFromPublicKey());
         contentValues.put(MessageEntry.COLUMN_TO_PUBLIC_KEY,message.getToPublicKey());
@@ -275,27 +275,7 @@ public class ChatDBHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean addMessage(Message message){
-        try {
-            SQLiteDatabase db = this.getWritableDatabase();
-            Log.d(TAG, "addMessage: " + message.toString());
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(ChatContract.MessageEntry.COLUMN_MESSAGE,message.getmessage());
-            contentValues.put(ChatContract.MessageEntry.COLUMN_FROM_PUBLIC_KEY,message.getPublicKey());
 
-            String query = "SELECT count(*) FROM " + ChatContract.MessageEntry.COLUMN_MESSAGE + " WHERE " + ChatContract.MessageEntry.COLUMN_FROM_PUBLIC_KEY + " ='" + message.getPublicKey() + "'";
-
-
-            db.insert(ChatContract.MessageEntry.COLUMN_MESSAGE,null,contentValues);
-
-            db.close();
-            return true;
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
 
 //    public List<Contact> getAllContact(){
 //        Log.d(TAG, "getAllContact: Called");

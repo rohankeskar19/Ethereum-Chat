@@ -3,28 +3,19 @@ package com.ethereumchat.Models;
 import java.io.Serializable;
 
 public class Message implements Serializable {
-    String name;
+
     String timestamp;
     String message;
-    String isImage;
+    Boolean isImage;
     String fromPublicKey;
     String toPublicKey;
 
-    public Message(String name, String timestamp, String message, String isImage, String fromPublicKey, String toPublicKey) {
-        this.name = name;
+    public Message(String timestamp, String message, Boolean isImage, String fromPublicKey, String toPublicKey) {
         this.timestamp = timestamp;
-        this.isImage = isImage;
         this.message = message;
+        this.isImage = isImage;
         this.fromPublicKey = fromPublicKey;
         this.toPublicKey = toPublicKey;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getTimestamp() {
@@ -43,12 +34,12 @@ public class Message implements Serializable {
         this.message = message;
     }
 
-    public String getIsImage() {
+    public Boolean getImage() {
         return isImage;
     }
 
-    public void setIsImage(String isImage) {
-        this.isImage = isImage;
+    public void setImage(Boolean image) {
+        isImage = image;
     }
 
     public String getFromPublicKey() {
@@ -65,17 +56,5 @@ public class Message implements Serializable {
 
     public void setToPublicKey(String toPublicKey) {
         this.toPublicKey = toPublicKey;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "name='" + name + '\'' +
-                ", timestamp='" + timestamp + '\'' +
-                ", message='" + message + '\'' +
-                ", isImage='" + isImage + '\'' +
-                ", fromPublicKey='" + fromPublicKey + '\'' +
-                ", toPublicKey='" + toPublicKey + '\'' +
-                '}';
     }
 }

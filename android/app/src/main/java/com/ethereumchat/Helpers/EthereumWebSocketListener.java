@@ -61,22 +61,29 @@ public class EthereumWebSocketListener extends WebSocketListener {
                         String payload = result.getString("payload");
                         byte[] bytes = WhisperHelper.hexStringToByteArray(payload);
                         String message = new String(bytes, StandardCharsets.UTF_8);
-                        JSONObject messages = response.getJSONObject("message");
-                        JSONObject public_key = messages.getJSONObject("public_key");
-                        Log.d(TAG, "onMessage: " + message);
+                        JSONObject messageObject = response.getJSONObject("message");
+                        String messageFrom = messageObject.getString("public_key");
+                        String messageText = messageObject.getString("text");
 
-                        Message msg = new Message(messages);
+                        if (messageObject.has("app")){
+                            String app = messageObject.getString("app");
 
-                        ChatDBHelper chatDBHelper = new ChatDBHelper(mReactApplicationContext);
+                            if(app.equals("EthereumChat")){
+                                String timeStamp = messageObject.getString("time_stamp");
+                                Boolean isImage = messageObject.getBoolean("is_image");
+                                String messageTo = "self";
 
-                        if(chatDBHelper.addMessage(msg)){
 
-                            success.invoke("saved message");
+                                Message msg = new Message(timeStamp,messageText,isImage,messageFrom,messageTo);
+
+                                ChatDBHelper chatDBHelper = new ChatDBHelper(mReactApplicationContext);
+
+                                chatDBHelper.addMessage(msg);
+                            }
+                            else{
+                                throw new Exception("Not for this application");
+                            }
                         }
-                        else{
-                            err.invoke("error");
-                        }
-
                         break;
                     default:
                         break;
