@@ -198,7 +198,7 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         if (cursor != null && cursor.moveToFirst()){
             cursor.moveToFirst();
 
-            Message message = new Message(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4),cursor.getString(5));
+            Message message = new Message(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4));
             cursor.close();
             return message;
         }
@@ -236,7 +236,7 @@ public class ChatDBHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()){
             do{
-                Message message = new Message(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4),cursor.getString(5));
+                Message message = new Message(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4));
 
                 messageList.add(message);
             }
