@@ -6,11 +6,11 @@ public class Message implements Serializable {
 
     String timestamp;
     String message;
-    Boolean isImage;
+    String isImage;
     String fromPublicKey;
     String toPublicKey;
 
-    public Message(String timestamp, String message, Boolean isImage, String fromPublicKey, String toPublicKey) {
+    public Message(String timestamp, String message, String isImage, String fromPublicKey, String toPublicKey) {
         this.timestamp = timestamp;
         this.message = message;
         this.isImage = isImage;
@@ -34,11 +34,11 @@ public class Message implements Serializable {
         this.message = message;
     }
 
-    public Boolean getImage() {
+    public String getImage() {
         return isImage;
     }
 
-    public void setImage(Boolean image) {
+    public void setImage(String image) {
         isImage = image;
     }
 
