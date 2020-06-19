@@ -58,15 +58,15 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.d(TAG, "addConversation: " + conversation.toString());
         ContentValues contentValues = new ContentValues();
-        contentValues.put(ConversationEntry.COLUMN_NAME,conversation.getName());
-        contentValues.put(ConversationEntry.COLUMN_PUBLIC_KEY,conversation.getPublicKey());
-        contentValues.put(ConversationEntry.COLUMN_PROFILE_IN_STRING, conversation.getProfileInString());
-        contentValues.put(ConversationEntry.COLUMN_LAST_MESSAGE,conversation.getLastMessage());
-        contentValues.put(ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP,conversation.getLastMessageTimestamp());
-        contentValues.put(ConversationEntry.COLUMN_READ,conversation.getRead());
+        contentValues.put(ChatContract.ConversationEntry.COLUMN_NAME,conversation.getName());
+        contentValues.put(ChatContract.ConversationEntry.COLUMN_PUBLIC_KEY,conversation.getPublicKey());
+        contentValues.put(ChatContract.ConversationEntry.COLUMN_PROFILE_IN_STRING, conversation.getProfileInString());
+        contentValues.put(ChatContract.ConversationEntry.COLUMN_LAST_MESSAGE,conversation.getLastMessage());
+        contentValues.put(ChatContract.ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP,conversation.getLastMessageTimestamp());
+        contentValues.put(ChatContract.ConversationEntry.COLUMN_READ,conversation.getRead());
 
 
-        db.insert(ConversationEntry.TABLE_NAME,null,contentValues);
+        db.insert(ChatContract.ConversationEntry.TABLE_NAME,null,contentValues);
 
         db.close();
 

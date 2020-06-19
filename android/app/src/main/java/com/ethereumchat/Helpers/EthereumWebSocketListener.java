@@ -70,7 +70,7 @@ public class EthereumWebSocketListener extends WebSocketListener {
 
                             if(app.equals("EthereumChat")){
                                 String timeStamp = messageObject.getString("time_stamp");
-                                Boolean isImage = messageObject.getBoolean("is_image");
+                                String isImage = messageObject.getString("is_image");
                                 String messageTo = "self";
 
 

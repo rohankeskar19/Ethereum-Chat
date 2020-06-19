@@ -15,16 +15,7 @@ import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import com.ethereumchat.Database.ChatContract;
-import com.ethereumchat.Database.ChatDBHelper;
 
-
-
-import com.ethereumchat.Helpers.EthereumWebSocketListener;
-import com.ethereumchat.Helpers.RequestTask;
-import com.ethereumchat.Helpers.WhisperAsyncRequestHandler;
-import com.ethereumchat.Helpers.WhisperHelper;
-import com.ethereumchat.Models.Contact;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -35,7 +26,7 @@ import com.facebook.react.uimanager.IllegalViewOperationException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.ethereumchat.Database.ChatDBHelper.*;
+
 
 
 import okhttp3.Dispatcher;
