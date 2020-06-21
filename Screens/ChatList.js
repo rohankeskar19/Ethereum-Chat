@@ -36,7 +36,6 @@ export class ChatList extends Component {
     var conversation = {};
     if (item) {
       contact = item.contact.item;
-      conversation = item.conversation.item;
     }
 
     return (
@@ -123,8 +122,7 @@ export class ChatList extends Component {
             data={contacts}
             renderItem={(contact) => <this.Item contact={contact} />}
             keyExtractor={(contact, index) => index.toString()}
-            renderItem={(conversation) => <this.Item conversation={conversation} />}
-            keyExtractor={(conversation, index) => index.toString()}
+            
           />
         </View>
       </View>
