@@ -16,6 +16,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 
+import com.ethereumchat.Database.ChatDBHelper;
+import com.ethereumchat.Helpers.EthereumWebSocketListener;
+import com.ethereumchat.Helpers.WhisperAsyncRequestHandler;
+import com.ethereumchat.Helpers.WhisperHelper;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
