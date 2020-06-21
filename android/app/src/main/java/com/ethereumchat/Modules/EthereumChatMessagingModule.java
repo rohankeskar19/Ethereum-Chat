@@ -20,11 +20,9 @@ import com.ethereumchat.Database.ChatDBHelper;
 import com.ethereumchat.Helpers.EthereumWebSocketListener;
 import com.ethereumchat.Helpers.WhisperAsyncRequestHandler;
 import com.ethereumchat.Helpers.WhisperHelper;
-<<<<<<< HEAD
-=======
+
 import com.ethereumchat.Models.Conversation;
 import com.ethereumchat.Models.Message;
->>>>>>> aa2d32a91e3bfa5316bf6325c3f07fd9fff715a7
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
