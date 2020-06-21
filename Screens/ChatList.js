@@ -15,7 +15,8 @@ const EthereumChatMessagingModule = NativeModules.EthereumChatMessagingModule;
 
 export class ChatList extends Component {
   state = {
-    contacts: null,
+    contacts:null,
+    conversation:null,
     recentChat: [],
   };
 
@@ -32,14 +33,16 @@ export class ChatList extends Component {
 
   Item = (item) => {
     var contact = {};
+    var conversation = {};
     if (item) {
       contact = item.contact.item;
+      conversation = item.conversation.item;
     }
 
     return (
       <TouchableOpacity
         style={styles.ContactItem}
-        onPress={() => this.navigate(contact)}
+        onPress={() => this.navigate(contact,conversation)}
       >
         {contact.profile_in_string == "default_image" ? (
           <Image
@@ -55,12 +58,15 @@ export class ChatList extends Component {
             />
           )}
         <Text style={styles.ContactName}>{contact.name}</Text>
+        <Text style={styles.ConversationMessage}>{conversation.last_message}</Text>
+        <Text style={styles.ConversationTime}>{conversation.last_message_timestamp}</Text>
+        <Text style={styles.ConversationStatus}>{conversation.read}</Text>
       </TouchableOpacity>
     );
   };
 
-  navigate = (contact) => {
-    this.props.navigation.navigate("Chat", { contact: contact });
+  navigate = (contact,conversation) => {
+    this.props.navigation.navigate("Chat", { contact: contact, conversation: conversation });
     console.log("clicked");
   };
 
@@ -72,6 +78,7 @@ export class ChatList extends Component {
     if (text.trim() == "") {
       this.setState({
         contacts: [],
+        conversation: [],
       });
     } else {
       EthereumChatMessagingModule.getContacts(
@@ -91,6 +98,7 @@ export class ChatList extends Component {
 
   render() {
     const { contacts } = this.state;
+    const { conversation } = this.state;
 
     return (
       <View>
@@ -115,6 +123,8 @@ export class ChatList extends Component {
             data={contacts}
             renderItem={(contact) => <this.Item contact={contact} />}
             keyExtractor={(contact, index) => index.toString()}
+            renderItem={(conversation) => <this.Item conversation={conversation} />}
+            keyExtractor={(conversation, index) => index.toString()}
           />
         </View>
       </View>
@@ -172,6 +182,21 @@ const styles = StyleSheet.create({
     color: "#000",
     marginLeft: 20,
     fontSize: 20,
+  },
+  ConversationMessage: {
+    color: "#000",
+    marginLeft: 20,
+    fontSize: 20,
+  },
+  ConversationTime: {
+    color: "#000",
+    marginLeft: 20,
+    fontSize: 15,
+  },
+  ConversationStatus: {
+    color: "#000",
+    marginLeft: 20,
+    fontSize: 15,
   },
   ChatList: {
     display: "flex",
