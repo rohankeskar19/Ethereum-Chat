@@ -18,7 +18,7 @@
     "react-native-gesture-handler": "^1.5.6",
     "react-native-image-picker": "^2.3.1",
     "react-native-permissions": "^2.0.10",
-    "react-native-qrcode-generator": "^1.2.0",
+    "react-native-qrcode-generator": "^1.2.2",
     "react-native-qrcode-scanner": "^1.4.0",
     "react-native-qrcode-svg": "^6.0.3",
     "react-native-reanimated": "^1.4.0",

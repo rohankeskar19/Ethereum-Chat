@@ -20,6 +20,11 @@ import com.ethereumchat.Database.ChatDBHelper;
 import com.ethereumchat.Helpers.EthereumWebSocketListener;
 import com.ethereumchat.Helpers.WhisperAsyncRequestHandler;
 import com.ethereumchat.Helpers.WhisperHelper;
+<<<<<<< HEAD
+=======
+import com.ethereumchat.Models.Conversation;
+import com.ethereumchat.Models.Message;
+>>>>>>> aa2d32a91e3bfa5316bf6325c3f07fd9fff715a7
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -64,8 +69,6 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
         catch (Exception e){
             e.printStackTrace();
         }
-
-
     }
 
     public EthereumChatMessagingModule(@NonNull ReactApplicationContext reactContext) {
@@ -95,8 +98,6 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
 
             success.invoke(contactsArray);
         }
-
-
     }
 
 
@@ -147,20 +148,23 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
               establishConnection(keyPair);
               newMessageCallback.invoke("success");
           }
-
-
-
-
-
-
       }
       catch (Exception e){
           error.invoke("error occured");
           e.printStackTrace();
       }
+    }
 
-
-
-
+    @ReactMethod
+    public void message_conversation(String name, String publicKey, String profileInString, String lastMessage, String lastMessageTimestamp, String read){
+        ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
+        Conversation conversation = new Conversation(name, publicKey, profileInString, lastMessage, lastMessageTimestamp, read);
+        Conversation con = chatDBHelper.checkIfConversationExists(publicKey);
+        if (con != null){
+            chatDBHelper.updateConversation(publicKey,lastMessage,lastMessageTimestamp,name,read);
+        }
+        else {
+            chatDBHelper.addConversation(conversation);
+        }
     }
 }
