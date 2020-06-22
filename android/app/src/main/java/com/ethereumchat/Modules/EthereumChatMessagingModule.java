@@ -100,6 +100,26 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
 
 
     @ReactMethod
+    public void getConversations(Callback err,Callback success){
+        Log.d(TAG, "getConversations: Called");
+
+
+        ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
+        String conversationsArray = chatDBHelper.getAllConversations();
+
+
+
+        if (conversationsArray.equals("error")){
+            err.invoke(conversationsArray);
+        }
+        else {
+
+            success.invoke(conversationsArray);
+        }
+    }
+
+
+    @ReactMethod
     public void postMessage(String message,String publicKey){
         try{
             SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
@@ -119,7 +139,10 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
             Log.d(TAG, "postMessage: " + cmd);
             new WhisperAsyncRequestHandler(null,null,null).execute(request,null,null);
 
-
+            Message msg = new Message(String.valueOf(System.currentTimeMillis()),message,"false",selfPublicKey,publicKey);
+            ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
+            chatDBHelper.addMessage(msg);
+            chatDBHelper.updateConversation(publicKey,message,String.valueOf(System.currentTimeMillis()),"true");
 
 
         }
@@ -159,7 +182,7 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
         Conversation conversation = new Conversation(name, publicKey, profileInString, lastMessage, lastMessageTimestamp, read);
         Conversation con = chatDBHelper.checkIfConversationExists(publicKey);
         if (con != null){
-            chatDBHelper.updateConversation(publicKey,lastMessage,lastMessageTimestamp,name,read);
+            chatDBHelper.updateConversation(publicKey,lastMessage,lastMessageTimestamp,read);
         }
         else {
             chatDBHelper.addConversation(conversation);

@@ -18,6 +18,7 @@ export class ChatList extends Component {
   state = {
     contacts:null,
     conversation:null,
+    chatlist:null,
     recentChat: [],
   };
 
@@ -32,7 +33,15 @@ export class ChatList extends Component {
     this.eventListener = eventEmitter.addListener('EventReminder', (event) => {
        console.log(event.eventProperty) // "someValue"
     });
+    EthereumChatMessagingModule.getConversations(
+      (err) => { },
+      (chatlist) => {
 
+        this.setState({
+          contacts: JSON.parse(chatlist),
+        });
+      }
+    );
   }
 
   Item = (item) => {
@@ -82,10 +91,19 @@ export class ChatList extends Component {
 
   searchUsers = (text) => {
     if (text.trim() == "") {
-      this.setState({
-        contacts: [],
-        conversation: [],
-      });
+      EthereumChatMessagingModule.getConversations(
+        (err) => { },
+        (chatlist) => {
+
+          this.setState({
+            contacts: JSON.parse(chatlist),
+          });
+        }
+      );
+      // this.setState({
+      //   contacts: [],
+      //   conversation: [],
+      // });
     } else {
       EthereumChatMessagingModule.getContacts(
         text,
