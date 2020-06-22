@@ -16,6 +16,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 
+import com.ethereumchat.Database.ChatDBHelper;
+import com.ethereumchat.Helpers.EthereumWebSocketListener;
+import com.ethereumchat.Helpers.WhisperAsyncRequestHandler;
+import com.ethereumchat.Helpers.WhisperHelper;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -82,6 +86,8 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
         ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
         String contactsArray = chatDBHelper.getAllContacts(name);
 
+
+
         if (contactsArray.equals("error")){
             err.invoke(contactsArray);
         }
@@ -97,12 +103,25 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
     @ReactMethod
     public void postMessage(String message,String publicKey){
         try{
+            SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
 
-            String cmd = "{\"jsonrpc\":\"2.0\",\"method\":\"shh_post\",\"params\":[{ \"pubKey\": \"" + publicKey + "\", \"ttl\": 7, \"powTarget\": 2.01, \"powTime\": 2, \"payload\": \"0x" + WhisperHelper.toHex(message) + "\" }],\"id\":1}";
+            String selfPublicKey = sharedPreferences.getString("public_key","nodata");
+
+            JSONObject messageBody = new JSONObject();
+            messageBody.put("app","EthereumChat");
+            messageBody.put("time_stamp",System.currentTimeMillis());
+            messageBody.put("text",message);
+            messageBody.put("is_image","false");
+            messageBody.put("public_key",publicKey);
+
+            String cmd = "{\"jsonrpc\":\"2.0\",\"method\":\"shh_post\",\"params\":[{ \"pubKey\": \"" + publicKey + "\", \"ttl\": 7, \"powTarget\": 2.01, \"powTime\": 2, \"payload\": \"0x" + WhisperHelper.toHex(messageBody.toString()) + "\" }],\"id\":1}";
             JSONObject request = new JSONObject(cmd);
             Log.d(TAG, "postMessage: " + WhisperHelper.toHex(publicKey));
             Log.d(TAG, "postMessage: " + cmd);
             new WhisperAsyncRequestHandler(null,null,null).execute(request,null,null);
+
+
+
 
         }
         catch (Exception e){

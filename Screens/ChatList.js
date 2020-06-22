@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   NativeModules,
   FlatList,
+  NativeEventEmitter
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
@@ -26,7 +27,10 @@ export class ChatList extends Component {
     }, err => {
       console.log(err)
     });
-
+    const eventEmitter = new NativeEventEmitter(NativeModules.ToastExample);
+    this.eventListener = eventEmitter.addListener('EventReminder', (event) => {
+       console.log(event.eventProperty) // "someValue"
+    });
 
   }
 
@@ -41,6 +45,9 @@ export class ChatList extends Component {
         style={styles.ContactItem}
         onPress={() => this.navigate(contact)}
       >
+        <View>
+
+        </View>
         {contact.profile_in_string == "default_image" ? (
           <Image
             source={require("../assets/default_profile.jpg")}

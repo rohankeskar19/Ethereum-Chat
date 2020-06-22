@@ -1,5 +1,6 @@
 package com.ethereumchat.Helpers;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -7,9 +8,18 @@ import android.util.Log;
 
 import com.ethereumchat.Database.ChatContract;
 import com.ethereumchat.Database.ChatDBHelper;
+import com.ethereumchat.MainApplication;
 import com.ethereumchat.Models.Message;
+import com.facebook.react.ReactInstanceManager;
+import com.facebook.react.ReactNativeHost;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.CatalystInstance;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.json.JSONObject;
 
@@ -61,6 +71,7 @@ public class EthereumWebSocketListener extends WebSocketListener {
                         String payload = result.getString("payload");
                         byte[] bytes = WhisperHelper.hexStringToByteArray(payload);
                         String message = new String(bytes, StandardCharsets.UTF_8);
+                        Log.d(TAG, "onMessage: " + message);
                         JSONObject messageObject = response.getJSONObject("message");
                         String messageFrom = messageObject.getString("public_key");
                         String messageText = messageObject.getString("text");
@@ -79,6 +90,15 @@ public class EthereumWebSocketListener extends WebSocketListener {
                                 ChatDBHelper chatDBHelper = new ChatDBHelper(mReactApplicationContext);
 
                                 chatDBHelper.addMessage(msg);
+                                JSONObject messageObjectToSend = new JSONObject();
+                                messageObjectToSend.put("from",messageFrom);
+                                messageObjectToSend.put("message_body",payload);
+                                messageObjectToSend.put("time",timeStamp);
+                                // Add code to send signals to react native ui
+                                WritableMap data = Arguments.createMap();
+                                data.putString("message",messageObjectToSend.toString());
+                                mReactApplicationContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                                        .emit("newMessage",data);
                             }
                             else{
                                 throw new Exception("Not for this application");
@@ -98,6 +118,7 @@ public class EthereumWebSocketListener extends WebSocketListener {
 
 
     }
+
 
     @Override
     public void onMessage(WebSocket webSocket, ByteString bytes) {

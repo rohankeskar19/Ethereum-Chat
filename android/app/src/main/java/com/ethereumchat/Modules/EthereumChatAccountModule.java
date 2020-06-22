@@ -46,6 +46,8 @@ public class EthereumChatAccountModule extends ReactContextBaseJavaModule implem
                     editor.putString("password",data.getString("password"));
                     editor.putString("key_pair",privateKeyID);
 
+
+
                     editor.commit();
                     callback.invoke(privateKeyID);
                     establishConnection(privateKeyID);
