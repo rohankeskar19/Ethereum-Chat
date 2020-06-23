@@ -69,15 +69,13 @@ export class ChatList extends Component {
         style={styles.ContactItem}
         onPress={() => this.navigate(contact,conversation)}
       >
-        <View>
-
-        </View>
-        {contact.profile_in_string == "default_image" ? (
-          <Image
-            source={require("../assets/default_profile.jpg")}
-            style={styles.ContactImage}
-          />
-        ) : (
+        <View style={styles.imgCol}>
+          {contact.profile_in_string == "default_image" ? (
+            <Image
+              source={require("../assets/default_profile.jpg")}
+              style={styles.ContactImage}
+            />
+          ) : (
             <Image
               source={{
                 uri: `data:image/gif;base64,${contact.profile_in_string}`,
@@ -85,10 +83,21 @@ export class ChatList extends Component {
               style={styles.ContactImage}
             />
           )}
-        <Text style={styles.ContactName}>{contact.name}</Text>
-        <Text style={styles.ConversationMessage}>{conversation.last_message}</Text>
-        <Text style={styles.ConversationTime}>{conversation.last_message_timestamp}</Text>
-        <Text style={styles.ConversationStatus}>{conversation.read}</Text>
+        </View>
+        <View style={styles.msgCol}>
+            <View style={styles.upperRow}>
+              <Text style={styles.ContactName}>{contact.name}</Text>
+              <Text style={styles.ConversationTime}>{contact.lastMessageTimestamp}</Text>
+            </View>
+            <View style={styles.lowerRow}>
+              <Text style={styles.ConversationMessage}>{contact.lastMessage}</Text>
+              {contact.read == "true" ? (
+                <Text></Text>
+                ) : (
+                <Text>⚫</Text>
+              )}
+            </View>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -191,18 +200,17 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 60,
     backgroundColor: "#e0e0e0",
-
     paddingHorizontal: 20,
     fontSize: 15,
   },
   ContactItem: {
     width: "100%",
     height: 90,
-    padding: 10,
+    padding:10,
     display: "flex",
     flexDirection: "row",
-    alignContent: "center",
-    alignItems: "center",
+    borderBottomWidth:1,
+    borderBottomColor: "#e0e0e0",
   },
   ContactImage: {
     width: 70,
@@ -213,21 +221,30 @@ const styles = StyleSheet.create({
     color: "#000",
     marginLeft: 20,
     fontSize: 20,
+    flex:1,
+    justifyContent:"flex-start",
   },
   ConversationMessage: {
-    color: "#000",
+    color: "#363636",
     marginLeft: 20,
-    fontSize: 20,
+    fontSize: 18,
+    flex:3,
+    justifyContent:"flex-start",
   },
   ConversationTime: {
     color: "#000",
-    marginLeft: 20,
+    marginRight: 20,
     fontSize: 15,
+    flex:1,
+    justifyContent:"flex-end",
+    textAlign: "right",
   },
   ConversationStatus: {
     color: "#000",
     marginLeft: 20,
     fontSize: 15,
+    flex:1,
+    justifyContent:"flex-end",
   },
   ChatList: {
     display: "flex",
@@ -235,6 +252,22 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  imgCol:{
+    flex:1,
+    justifyContent:"flex-start",
+  },
+  msgCol:{
+    flex:5,
+    justifyContent:"flex-end",
+    alignItems: "center",
+    alignContent: "center",
+  },
+  upperRow:{
+    flexDirection:"row",
+  },
+  lowerRow:{
+    flexDirection:"row",
+  }
 });
 
 export default ChatList;
