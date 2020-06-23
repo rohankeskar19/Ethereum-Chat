@@ -4,7 +4,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  NativeModules
+  NativeModules,
+  ToastAndroid
 } from "react-native";
 import QRCodeScanner from "react-native-qrcode-scanner";
 import { RNCamera as Camera } from "react-native-camera";
@@ -12,6 +13,7 @@ import { RNCamera as Camera } from "react-native-camera";
 const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 
 export class QrScan extends Component {
+
   onSuccess = e => {
     const data = JSON.parse(e.data);
 
@@ -28,7 +30,8 @@ export class QrScan extends Component {
         err => {},
         success => {
           console.log("Saved account");
-          this.props.navigation.goBack(null);
+          this.props.navigation.popToTop();
+          ToastAndroid.showWithGravity("User saved! Search the user to send message",ToastAndroid.LONG,ToastAndroid.CENTER);
         }
       );
     }
