@@ -71,8 +71,8 @@ public class EthereumWebSocketListener extends WebSocketListener {
                         String payload = result.getString("payload");
                         byte[] bytes = WhisperHelper.hexStringToByteArray(payload);
                         String message = new String(bytes, StandardCharsets.UTF_8);
-                        Log.d(TAG, "onMessage: " + message);
-                        JSONObject messageObject = response.getJSONObject("message");
+
+                        JSONObject messageObject = new JSONObject(message);
                         String messageFrom = messageObject.getString("public_key");
                         String messageText = messageObject.getString("text");
 
