@@ -290,7 +290,7 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         Log.d(TAG, "getAllMessages: Called");
         ArrayList<Message> messageList = new ArrayList<>();
 
-        String query = "SELECT * FROM " + MessageEntry.TABLE_NAME + " WHERE " + MessageEntry.COLUMN_FROM_PUBLIC_KEY + "= '" + conversationID + "'";
+        String query = "SELECT * FROM " + MessageEntry.TABLE_NAME + " WHERE " + MessageEntry.COLUMN_FROM_PUBLIC_KEY + "= '" + conversationID + "' OR " + MessageEntry.COLUMN_TO_PUBLIC_KEY + "= '" + conversationID + "'";
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -301,11 +301,13 @@ public class ChatDBHelper extends SQLiteOpenHelper {
             do{
                 try{
                     JSONObject message = new JSONObject();
-                    message.put("timestamp",cursor.getString(0));
-                    message.put("message",cursor.getString(1));
+                    message.put("name",cursor.getString(0));
+                    message.put("timestamp",cursor.getString(1));
+
                     message.put("is_image",cursor.getString(2));
-                    message.put("from",cursor.getString(3));
-                    message.put("to",cursor.getString(4));
+                    message.put("text",cursor.getString(3));
+                    message.put("from",cursor.getString(4));
+                    message.put("to",cursor.getString(5));
 
                     messages.put(index,message);
                     index++;

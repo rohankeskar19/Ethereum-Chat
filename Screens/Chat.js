@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { View } from "react-native";
-import { Text, FlatList, StyleSheet, NativeModules } from "react-native";
+import { Text, FlatList, StyleSheet, NativeModules, DeviceEventEmitter } from "react-native";
 import InputBar from "../components/InputBar";
 import MessageBubble from "../components/MessageBubble";
 
@@ -13,16 +13,22 @@ export default class Chat extends Component {
     contact: {}
   };
 
+  onNewMessage = (event) => {
+    console.log(event);  
+  };
+
   componentDidMount() {
-    
+    DeviceEventEmitter.addListener('newMessage', this.onNewMessage);
+
     const contact = this.props.navigation.getParam("contact", "null");
     this.setState({
       contact
     },() => {
       console.log(contact);
       EthereumChatMessagingModule.getMessages(contact.public_key,messages => {
+        console.log(messages);
         this.setState({
-          messages: messages
+          messages: JSON.parse(messages)
         })
       },err => {
         console.log(err)
@@ -63,36 +69,39 @@ export default class Chat extends Component {
 
   MessageItem = (messageItem) => {
     var message = messageItem.message.item;
-    console.log("messageItem" + messageItem.message)
-    // if(message.from == this.state.contact.public_key){
-    //   message.direction = "left";
-    // }
-    // else{
-    //   message.direction = "right";
-    // }
+    
+    console.log("messageItem " , message);
+    if(message.from == this.state.contact.public_key){
+      message.direction = "left";
+    }
+    else{
+      message.direction = "right";
+    }
 
     return <MessageBubble direction={message.direction} text={message.text} />;
   };
 
   render() {
     const { messages } = this.state;
-    console.log("state  " + JSON.stringify(this.state));
+    console.log("messages",messages)
     return (
       <View style={styles.outer}>
         <View style={styles.Header}>
           <Text style={{ color: "white" }}>Photo & Name</Text>
         </View>
-
-        <FlatList
-          data={messages}
-          style={styles.messages}
-          renderItem={(message) => <this.MessageItem message={message} />}
-          keyExtractor={(message, index) => index.toString()}
-          ref="FlatList"
-          onContentSizeChange={() =>
-            this.refs.FlatList.scrollToEnd({ animated: false })
-          }
-        />
+      
+       <FlatList
+        data={messages}
+        style={styles.messages}
+        renderItem={(message) => <this.MessageItem message={message} />}
+        keyExtractor={(message, index) => index.toString()}
+        ref="FlatList"
+        onContentSizeChange={() =>
+          this.refs.FlatList.scrollToEnd({ animated: false })
+        }
+      />
+      
+        
         <InputBar
           onSendPressed={() => this.sendMessage()}
           onSizeChange={() => this.onInputSizeChange()}

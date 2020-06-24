@@ -127,7 +127,7 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
             ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
 
             String messages = chatDBHelper.getAllMessages(pubKey);
-
+            Log.d(TAG, "getMessages: " + messages);
             success.invoke(messages);
 
         }
