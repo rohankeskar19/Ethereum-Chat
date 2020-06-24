@@ -14,7 +14,10 @@ export default class Chat extends Component {
   };
 
   onNewMessage = (event) => {
-    console.log(event);  
+    console.log("event123",JSON.parse(event.message))
+    this.setState({
+      messages: [...this.state.messages,JSON.parse(event.message)]
+    }) 
   };
 
   componentDidMount() {
@@ -24,9 +27,9 @@ export default class Chat extends Component {
     this.setState({
       contact
     },() => {
-      console.log(contact);
+      
       EthereumChatMessagingModule.getMessages(contact.public_key,messages => {
-        console.log(messages);
+        
         this.setState({
           messages: JSON.parse(messages)
         })
@@ -70,7 +73,7 @@ export default class Chat extends Component {
   MessageItem = (messageItem) => {
     var message = messageItem.message.item;
     
-    console.log("messageItem " , message);
+   
     if(message.from == this.state.contact.public_key){
       message.direction = "left";
     }
@@ -83,7 +86,7 @@ export default class Chat extends Component {
 
   render() {
     const { messages } = this.state;
-    console.log("messages",messages)
+   
     return (
       <View style={styles.outer}>
         <View style={styles.Header}>

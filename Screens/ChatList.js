@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   NativeModules,
   FlatList,
-  NativeEventEmitter
+  DeviceEventEmitter
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
@@ -16,27 +16,40 @@ const EthereumChatMessagingModule = NativeModules.EthereumChatMessagingModule;
 
 export class ChatList extends Component {
   state = {
-    contacts:null,
+    contacts:[],
     conversation:null,
-    chatlist:null,
+    chatlist:[],
     recentChat: [],
   };
 
+  onNewMessage = (event) => {
+    const message = JSON.parse(event.message);
+    
+    var chatlist =  this.state.contacts;
+    for(var i = 0; i < chatlist.length; i++){
+      if(chatlist[i].public_key == message.from){
+        chatlist[i].lastMessage = message.text;
+        chatlist[i].lastMessageTimestamp = message.time_stamp;
+        this.setState({
+          contacts : chatlist
+        })
+        console.log("Chatlist updated",chatlist)
+      }
+    }
+
+  };
+
   componentDidMount() {
-    console.log("object")
+    DeviceEventEmitter.addListener('newMessage', this.onNewMessage);
     EthereumChatMessagingModule.subscribeMessages((newMessage) => {
-      console.log(newMessage)
     }, err => {
       console.log(err)
     });
-    const eventEmitter = new NativeEventEmitter(NativeModules.ToastExample);
-    this.eventListener = eventEmitter.addListener('EventReminder', (event) => {
-       console.log(event.eventProperty) // "someValue"
-    });
+    
     EthereumChatMessagingModule.getConversations(
       (err) => { },
       (chatlist) => {
-        console.log(chatlist);
+        
         this.setState({
           contacts: JSON.parse(chatlist),
         });
@@ -82,7 +95,6 @@ export class ChatList extends Component {
 
   navigate = (contact,conversation) => {
     this.props.navigation.navigate("Chat", { contact: contact, conversation: conversation });
-    console.log("clicked");
   };
 
   openSettings = () => {
@@ -100,10 +112,7 @@ export class ChatList extends Component {
           });
         }
       );
-      // this.setState({
-      //   contacts: [],
-      //   conversation: [],
-      // });
+     
     } else {
       EthereumChatMessagingModule.getContacts(
         text,
@@ -122,7 +131,6 @@ export class ChatList extends Component {
 
   render() {
     const { contacts } = this.state;
-    const { conversation } = this.state;
 
     return (
       <View>

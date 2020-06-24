@@ -260,6 +260,8 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         contentValues.put(MessageEntry.COLUMN_TO_PUBLIC_KEY,message.getToPublicKey());
 
         Conversation conversation = checkIfConversationExists(message.getFromPublicKey());
+        message_conversation("none",message.getFromPublicKey(),"default_image",message.getMessage(),message.getTimestamp(),"false");
+
         Log.d(TAG, "addMessage: " + selfPubKey.equals(message.getFromPublicKey()));
         if(!selfPubKey.equals(message.getFromPublicKey())){
             if(conversation == null){
@@ -328,6 +330,17 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         return messages.toString();
     }
 
+
+    public void message_conversation(String name, String publicKey, String profileInString, String lastMessage, String lastMessageTimestamp, String read){
+        Conversation conversation = new Conversation(name, publicKey, profileInString, lastMessage, lastMessageTimestamp, read);
+        Conversation con = checkIfConversationExists(publicKey);
+        if (con != null){
+            updateConversation(publicKey,lastMessage,lastMessageTimestamp,read);
+        }
+        else {
+            addConversation(conversation);
+        }
+    }
 
     public boolean addContact(Contact contact){
         try{

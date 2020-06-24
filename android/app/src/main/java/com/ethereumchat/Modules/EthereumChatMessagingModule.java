@@ -152,6 +152,7 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
             messageBody.put("is_image","false");
             messageBody.put("public_key",selfPublicKey);
 
+
             String cmd = "{\"jsonrpc\":\"2.0\",\"method\":\"shh_post\",\"params\":[{ \"pubKey\": \"" + publicKey + "\", \"ttl\": 7, \"powTarget\": 2.01, \"powTime\": 2, \"payload\": \"0x" + WhisperHelper.toHex(messageBody.toString()) + "\" }],\"id\":1}";
             JSONObject request = new JSONObject(cmd);
             Log.d(TAG, "postMessage: " + WhisperHelper.toHex(publicKey));
@@ -195,16 +196,6 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
       }
     }
 
-    @ReactMethod
-    public void message_conversation(String name, String publicKey, String profileInString, String lastMessage, String lastMessageTimestamp, String read){
-        ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
-        Conversation conversation = new Conversation(name, publicKey, profileInString, lastMessage, lastMessageTimestamp, read);
-        Conversation con = chatDBHelper.checkIfConversationExists(publicKey);
-        if (con != null){
-            chatDBHelper.updateConversation(publicKey,lastMessage,lastMessageTimestamp,read);
-        }
-        else {
-            chatDBHelper.addConversation(conversation);
-        }
-    }
+
+
 }

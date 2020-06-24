@@ -96,8 +96,8 @@ public class EthereumWebSocketListener extends WebSocketListener {
                                 chatDBHelper.addMessage(msg,selfPubKey);
                                 JSONObject messageObjectToSend = new JSONObject();
                                 messageObjectToSend.put("from",messageFrom);
-                                messageObjectToSend.put("message_body",payload);
-                                messageObjectToSend.put("time",timeStamp);
+                                messageObjectToSend.put("text",messageText);
+                                messageObjectToSend.put("time_stamp",timeStamp);
                                 // Add code to send signals to react native ui
                                 WritableMap data = Arguments.createMap();
                                 data.putString("message",messageObjectToSend.toString());
