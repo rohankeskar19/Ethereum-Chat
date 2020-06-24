@@ -36,6 +36,7 @@ public class EthereumWebSocketListener extends WebSocketListener {
     private static final int NORMAL_CLOSURE_STATUS = 1000;
 
     private static final String TAG = "EthereumWebSocketListen";
+    private String selfPubKey = "";
 
     private final @Nullable ReactApplicationContext mReactApplicationContext;
 
@@ -43,8 +44,9 @@ public class EthereumWebSocketListener extends WebSocketListener {
         mReactApplicationContext = null;
     }
 
-    public EthereumWebSocketListener(@Nullable ReactApplicationContext reactContext) {
+    public EthereumWebSocketListener(@Nullable ReactApplicationContext reactContext, String pubKey) {
         mReactApplicationContext = reactContext;
+        selfPubKey = pubKey;
     }
 
 
@@ -76,6 +78,7 @@ public class EthereumWebSocketListener extends WebSocketListener {
                         String messageFrom = messageObject.getString("public_key");
                         String messageText = messageObject.getString("text");
 
+                        Log.d(TAG, "onMessage: msgobj " + messageObject.toString());
                         if (messageObject.has("app")){
                             String app = messageObject.getString("app");
 
@@ -84,12 +87,12 @@ public class EthereumWebSocketListener extends WebSocketListener {
                                 String isImage = messageObject.getString("is_image");
                                 String messageTo = "self";
 
-
+                                Log.d(TAG, "onMessage: msgtxt" + messageText);
                                 Message msg = new Message(timeStamp,messageText,isImage,messageFrom,messageTo);
-
+                                Log.d(TAG, "onMessage: " + msg.toString());
                                 ChatDBHelper chatDBHelper = new ChatDBHelper(mReactApplicationContext);
 
-                                chatDBHelper.addMessage(msg);
+                                chatDBHelper.addMessage(msg,selfPubKey);
                                 JSONObject messageObjectToSend = new JSONObject();
                                 messageObjectToSend.put("from",messageFrom);
                                 messageObjectToSend.put("message_body",payload);

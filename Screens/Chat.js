@@ -14,15 +14,26 @@ export default class Chat extends Component {
   };
 
   componentDidMount() {
-
+    
     const contact = this.props.navigation.getParam("contact", "null");
     this.setState({
       contact
+    },() => {
+      console.log(contact);
+      EthereumChatMessagingModule.getMessages(contact.public_key,messages => {
+        this.setState({
+          messages: messages
+        })
+      },err => {
+        console.log(err)
+      });
+
     })
     this.refs.FlatList.scrollToEnd({ animated: true });
+
+
   }
 
-  componentDidUpdate() { }
 
   sendMessage() {
     const message = {
@@ -51,13 +62,21 @@ export default class Chat extends Component {
   }
 
   MessageItem = (messageItem) => {
-    const message = messageItem.message.item;
+    var message = messageItem.message.item;
+    console.log("messageItem" + messageItem.message)
+    // if(message.from == this.state.contact.public_key){
+    //   message.direction = "left";
+    // }
+    // else{
+    //   message.direction = "right";
+    // }
+
     return <MessageBubble direction={message.direction} text={message.text} />;
   };
 
   render() {
     const { messages } = this.state;
-    console.log(messages);
+    console.log("state  " + JSON.stringify(this.state));
     return (
       <View style={styles.outer}>
         <View style={styles.Header}>

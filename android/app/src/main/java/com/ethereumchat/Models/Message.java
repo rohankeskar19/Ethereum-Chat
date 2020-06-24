@@ -57,4 +57,15 @@ public class Message implements Serializable {
     public void setToPublicKey(String toPublicKey) {
         this.toPublicKey = toPublicKey;
     }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "timestamp='" + timestamp + '\'' +
+                ", message='" + message + '\'' +
+                ", isImage='" + isImage + '\'' +
+                ", fromPublicKey='" + fromPublicKey + '\'' +
+                ", toPublicKey='" + toPublicKey + '\'' +
+                '}';
+    }
 }

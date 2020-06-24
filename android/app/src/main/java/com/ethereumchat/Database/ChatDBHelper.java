@@ -2,6 +2,7 @@ package com.ethereumchat.Database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -133,44 +134,82 @@ public class ChatDBHelper extends SQLiteOpenHelper {
 
     }
 
-
-    public List<Conversation> getAllConversation(){
-        Log.d(TAG, "getAllConversation: Called");
-        List<Conversation> conversationList = new ArrayList<>();
-
-        String query = "SELECT * FROM " + ConversationEntry.TABLE_NAME + " ORDER BY " + ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP + " DESC";
-
+    public String getAllConversations(){
+        JSONArray conversations = new JSONArray();
         SQLiteDatabase db = this.getWritableDatabase();
-
+        String query = "SELECT * FROM " + ConversationEntry.TABLE_NAME + " ORDER BY " + ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP + " DESC";
         Cursor cursor = db.rawQuery(query,null);
 
         if (cursor.moveToFirst()){
             do{
-                Log.d(TAG, "checkIfConversationExists: " + cursor.getString(0));
-                Log.d(TAG, "checkIfConversationExists: " + cursor.getString(1));
-                Log.d(TAG, "checkIfConversationExists: " + cursor.getString(2));
-                Log.d(TAG, "checkIfConversationExists: " + cursor.getString(3));
-                Log.d(TAG, "checkIfConversationExists: " + cursor.getString(4));
-                Log.d(TAG, "checkIfConversationExists: " + cursor.getString(5));
+                try{
+                    JSONObject conversation = new JSONObject();
 
-                Conversation conversation = new Conversation(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4),cursor.getString(5));
 
-                conversationList.add(conversation);
-            }
-            while (cursor.moveToNext());
+                    conversation.put("name",cursor.getString(0));
+                    conversation.put("public_key",cursor.getString(1));
+                    conversation.put("profile_in_string",cursor.getString(2));
+                    conversation.put("lastMessage",cursor.getString(3));
+                    conversation.put("lastMessageTimestamp",cursor.getString(4));
+                    conversation.put("read",cursor.getString(5));
+
+                    conversations.put(conversation);
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                    return "error";
+                }
+
+            }while (cursor.moveToNext());
+            cursor.close();
+            return conversations.toString();
+        }
+        else{
+            cursor.close();
+
+            return conversations.toString();
         }
 
-        cursor.close();
-        return conversationList;
+
     }
 
-    public void updateConversation(String public_key,String lastMessage,String lastMessageTimeStamp,String name,String read){
+
+    // public List<Conversation> getAllConversation(){
+    //     Log.d(TAG, "getAllConversation: Called");
+    //     List<Conversation> conversationList = new ArrayList<>();
+
+    //     String query = "SELECT * FROM " + ConversationEntry.TABLE_NAME + " ORDER BY " + ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP + " DESC";
+
+    //     SQLiteDatabase db = this.getWritableDatabase();
+
+    //     Cursor cursor = db.rawQuery(query,null);
+
+    //     if (cursor.moveToFirst()){
+    //         do{
+    //             Log.d(TAG, "checkIfConversationExists: " + cursor.getString(0));
+    //             Log.d(TAG, "checkIfConversationExists: " + cursor.getString(1));
+    //             Log.d(TAG, "checkIfConversationExists: " + cursor.getString(2));
+    //             Log.d(TAG, "checkIfConversationExists: " + cursor.getString(3));
+    //             Log.d(TAG, "checkIfConversationExists: " + cursor.getString(4));
+    //             Log.d(TAG, "checkIfConversationExists: " + cursor.getString(5));
+
+    //             Conversation conversation = new Conversation(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4),cursor.getString(5));
+
+    //             conversationList.add(conversation);
+    //         }
+    //         while (cursor.moveToNext());
+    //     }
+
+    //     cursor.close();
+    //     return conversationList;
+    // }
+
+    public void updateConversation(String public_key,String lastMessage,String lastMessageTimeStamp,String read){
         Log.d(TAG, "updateConversation: Called");
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(ConversationEntry.COLUMN_NAME,name);
         contentValues.put(ConversationEntry.COLUMN_LAST_MESSAGE,lastMessage);
         contentValues.put(ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP,lastMessageTimeStamp);
         contentValues.put(ConversationEntry.COLUMN_READ,read);
@@ -207,24 +246,47 @@ public class ChatDBHelper extends SQLiteOpenHelper {
     }
 
 
-    public void addMessage(Message message){
+    public void addMessage(Message message, String selfPubKey){
         Log.d(TAG, "addMessage: Called");
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(MessageEntry.COLUMN_TIMESTAMP,message.getTimestamp());
+
         contentValues.put(MessageEntry.COLUMN_IS_IMAGE,message.getImage());
         contentValues.put(MessageEntry.COLUMN_MESSAGE,message.getMessage());
         contentValues.put(MessageEntry.COLUMN_FROM_PUBLIC_KEY,message.getFromPublicKey());
         contentValues.put(MessageEntry.COLUMN_TO_PUBLIC_KEY,message.getToPublicKey());
+
+        Conversation conversation = checkIfConversationExists(message.getFromPublicKey());
+        Log.d(TAG, "addMessage: " + selfPubKey.equals(message.getFromPublicKey()));
+        if(!selfPubKey.equals(message.getFromPublicKey())){
+            if(conversation == null){
+                Log.d(TAG, "addMessage: conversation null" );
+                contentValues.put(MessageEntry.COLUMN_NAME,message.getFromPublicKey());
+                Conversation conversation1 = new Conversation("Unknown",message.getFromPublicKey(),"default_image",message.getMessage(),message.getTimestamp(),"false");
+                addConversation(conversation1);
+            }
+            else{
+                Log.d(TAG, "addMessage: conversation not null");
+                contentValues.put(MessageEntry.COLUMN_NAME,"none");
+            }
+
+
+        }
+        else{
+            contentValues.put(MessageEntry.COLUMN_NAME,"none");
+        }
+
+
 
         db.insert(MessageEntry.TABLE_NAME,null,contentValues);
 
         db.close();
     }
 
-    public ArrayList<Message> getAllMessages(String conversationID){
+    public String getAllMessages(String conversationID){
         Log.d(TAG, "getAllMessages: Called");
         ArrayList<Message> messageList = new ArrayList<>();
 
@@ -233,12 +295,27 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         Cursor cursor = db.rawQuery(query,null);
-
+        int index = 0;
+        JSONArray messages = new JSONArray();
         if (cursor.moveToFirst()){
             do{
-                Message message = new Message(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4));
+                try{
+                    JSONObject message = new JSONObject();
+                    message.put("timestamp",cursor.getString(0));
+                    message.put("message",cursor.getString(1));
+                    message.put("is_image",cursor.getString(2));
+                    message.put("from",cursor.getString(3));
+                    message.put("to",cursor.getString(4));
 
-                messageList.add(message);
+                    messages.put(index,message);
+                    index++;
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+
+
+
             }
             while (cursor.moveToNext());
         }
@@ -246,7 +323,7 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         cursor.close();
 
 
-        return messageList;
+        return messages.toString();
     }
 
 
@@ -254,15 +331,25 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         try{
             SQLiteDatabase db = this.getWritableDatabase();
             Log.d(TAG, "addContact: " + contact.toString());
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(ContactEntry.COLUMN_NAME,contact.getName());
-            contentValues.put(ContactEntry.COLUMN_PUBLIC_KEY,contact.getPublicKey());
-            contentValues.put(ContactEntry.COLUMN_PROFILE_IN_STRING, contact.getProfileInString());
+            ContentValues contentValues1 = new ContentValues();
+            ContentValues contentValues2 = new ContentValues();
+
+            contentValues1.put(ContactEntry.COLUMN_NAME,contact.getName());
+            contentValues1.put(ContactEntry.COLUMN_PUBLIC_KEY,contact.getPublicKey());
+            contentValues1.put(ContactEntry.COLUMN_PROFILE_IN_STRING, contact.getProfileInString());
+
+            contentValues2.put(ConversationEntry.COLUMN_NAME,contact.getName());
+            contentValues2.put(ConversationEntry.COLUMN_PUBLIC_KEY,contact.getPublicKey());
+            contentValues2.put(ConversationEntry.COLUMN_PROFILE_IN_STRING, contact.getProfileInString());
+            contentValues2.put(ConversationEntry.COLUMN_LAST_MESSAGE,"");
+            contentValues2.put(ConversationEntry.COLUMN_LAST_MESSAGE_TIMESTAMP,"0");
+            contentValues2.put(ConversationEntry.COLUMN_READ, "true");
 
             String checkExists = "SELECT count(*) FROM " + ContactEntry.TABLE_NAME + " WHERE " + ContactEntry.COLUMN_PUBLIC_KEY + " ='" + contact.getPublicKey() + "'";
 
 
-            db.insert(ContactEntry.TABLE_NAME,null,contentValues);
+            db.insert(ContactEntry.TABLE_NAME,null,contentValues1);
+            db.insert(ConversationEntry.TABLE_NAME,null,contentValues2);
 
             db.close();
             return true;

@@ -56,8 +56,11 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
             Request request = new Request.Builder().url(
                     "ws://" + WhisperHelper.ip + ":" + WhisperHelper.wsPort
             ).build();
+            SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
 
-            EthereumWebSocketListener ethereumWebSocketListener = new EthereumWebSocketListener();
+            String selfPublicKey = sharedPreferences.getString("public_key","nodata");
+
+            EthereumWebSocketListener ethereumWebSocketListener = new EthereumWebSocketListener(getReactApplicationContext(),selfPublicKey);
             WebSocket ws = client.newWebSocket(request,ethereumWebSocketListener);
             JSONObject subscribeRequest = new JSONObject("{\"jsonrpc\":\"2.0\",\"method\":\"shh_subscribe\",\"params\":[\"messages\", { \"privateKeyID\": \"" + privateKeyID + "\", \"pow\": 12.3 }],\"id\":1}");
             ws.send(subscribeRequest.toString());
@@ -100,6 +103,42 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
 
 
     @ReactMethod
+    public void getConversations(Callback err,Callback success){
+        Log.d(TAG, "getConversations: Called");
+
+
+        ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
+        String conversationsArray = chatDBHelper.getAllConversations();
+
+
+
+        if (conversationsArray.equals("error")){
+            err.invoke(conversationsArray);
+        }
+        else {
+            Log.d(TAG, "getConversations: " + conversationsArray);
+            success.invoke(conversationsArray);
+        }
+    }
+
+    @ReactMethod
+    public void getMessages(String pubKey,Callback success, Callback err){
+        try{
+            ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
+
+            String messages = chatDBHelper.getAllMessages(pubKey);
+
+            success.invoke(messages);
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            err.invoke("Error occured while retrieving messages");
+        }
+    }
+
+
+    @ReactMethod
     public void postMessage(String message,String publicKey){
         try{
             SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
@@ -111,7 +150,7 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
             messageBody.put("time_stamp",System.currentTimeMillis());
             messageBody.put("text",message);
             messageBody.put("is_image","false");
-            messageBody.put("public_key",publicKey);
+            messageBody.put("public_key",selfPublicKey);
 
             String cmd = "{\"jsonrpc\":\"2.0\",\"method\":\"shh_post\",\"params\":[{ \"pubKey\": \"" + publicKey + "\", \"ttl\": 7, \"powTarget\": 2.01, \"powTime\": 2, \"payload\": \"0x" + WhisperHelper.toHex(messageBody.toString()) + "\" }],\"id\":1}";
             JSONObject request = new JSONObject(cmd);
@@ -119,7 +158,10 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
             Log.d(TAG, "postMessage: " + cmd);
             new WhisperAsyncRequestHandler(null,null,null).execute(request,null,null);
 
-
+            Message msg = new Message(String.valueOf(System.currentTimeMillis()),message,"false",selfPublicKey,publicKey);
+            ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
+            chatDBHelper.addMessage(msg,selfPublicKey);
+            chatDBHelper.updateConversation(publicKey,message,String.valueOf(System.currentTimeMillis()),"true");
 
 
         }
@@ -159,7 +201,7 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
         Conversation conversation = new Conversation(name, publicKey, profileInString, lastMessage, lastMessageTimestamp, read);
         Conversation con = chatDBHelper.checkIfConversationExists(publicKey);
         if (con != null){
-            chatDBHelper.updateConversation(publicKey,lastMessage,lastMessageTimestamp,name,read);
+            chatDBHelper.updateConversation(publicKey,lastMessage,lastMessageTimestamp,read);
         }
         else {
             chatDBHelper.addConversation(conversation);
