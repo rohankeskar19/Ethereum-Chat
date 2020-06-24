@@ -10,6 +10,7 @@ import {
   DeviceEventEmitter
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
+import { format } from 'timeago.js';
 
 const EthereumChatAccountModule = NativeModules.EthereumChatAccountModule;
 const EthereumChatMessagingModule = NativeModules.EthereumChatMessagingModule;
@@ -87,7 +88,7 @@ export class ChatList extends Component {
         <View style={styles.msgCol}>
             <View style={styles.upperRow}>
               <Text style={styles.ContactName}>{contact.name}</Text>
-              <Text style={styles.ConversationTime}>{contact.lastMessageTimestamp}</Text>
+              <Text style={styles.ConversationTime}>{format(contact.lastMessageTimestamp)}</Text>
             </View>
             <View style={styles.lowerRow}>
               <Text style={styles.ConversationMessage}>{contact.lastMessage}</Text>
