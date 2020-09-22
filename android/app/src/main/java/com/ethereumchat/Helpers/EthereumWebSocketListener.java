@@ -84,12 +84,13 @@ public class EthereumWebSocketListener extends WebSocketListener {
                             String app = messageObject.getString("app");
 
                             if(app.equals("EthereumChat")){
+                                String name = messageObject.getString("name");
                                 String timeStamp = messageObject.getString("time_stamp");
                                 String isImage = messageObject.getString("is_image");
                                 String messageTo = "self";
 
                                 Log.d(TAG, "onMessage: msgtxt" + messageText);
-                                Message msg = new Message(timeStamp,messageText,isImage,messageFrom,messageTo);
+                                Message msg = new Message(name,timeStamp,messageText,isImage,messageFrom,messageTo);
                                 Log.d(TAG, "onMessage: " + msg.toString());
                                 ChatDBHelper chatDBHelper = new ChatDBHelper(mReactApplicationContext);
 

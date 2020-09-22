@@ -109,12 +109,13 @@ public class ChatDBHelper extends SQLiteOpenHelper {
             do{
                 try{
                     JSONObject contact = new JSONObject();
-
+                    
                     contact.put("name",cursor.getString(0));
                     contact.put("public_key",cursor.getString(1));
                     contact.put("profile_in_string",cursor.getString(2));
 
                     contacts.put(contact);
+                    
                 }
                 catch (Exception e){
                     e.printStackTrace();
@@ -237,7 +238,7 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         if (cursor != null && cursor.moveToFirst()){
             cursor.moveToFirst();
 
-            Message message = new Message(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4));
+            Message message = new Message(cursor.getString(0),cursor.getString(1),cursor.getString(2),cursor.getString(3),cursor.getString(4),cursor.getString(5));
             cursor.close();
             return message;
         }
@@ -251,35 +252,27 @@ public class ChatDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-
+        contentValues.put(MessageEntry.COLUMN_NAME,message.getName());
         contentValues.put(MessageEntry.COLUMN_TIMESTAMP,message.getTimestamp());
-
         contentValues.put(MessageEntry.COLUMN_IS_IMAGE,message.getImage());
         contentValues.put(MessageEntry.COLUMN_MESSAGE,message.getMessage());
         contentValues.put(MessageEntry.COLUMN_FROM_PUBLIC_KEY,message.getFromPublicKey());
         contentValues.put(MessageEntry.COLUMN_TO_PUBLIC_KEY,message.getToPublicKey());
 
         Conversation conversation = checkIfConversationExists(message.getFromPublicKey());
-        message_conversation("none",message.getFromPublicKey(),"default_image",message.getMessage(),message.getTimestamp(),"false");
+        message_conversation(message.getName(),message.getFromPublicKey(),"default_image",message.getMessage(),message.getTimestamp(),"false");
 
         Log.d(TAG, "addMessage: " + selfPubKey.equals(message.getFromPublicKey()));
-        if(!selfPubKey.equals(message.getFromPublicKey())){
             if(conversation == null){
                 Log.d(TAG, "addMessage: conversation null" );
                 contentValues.put(MessageEntry.COLUMN_NAME,message.getFromPublicKey());
-                Conversation conversation1 = new Conversation("Unknown",message.getFromPublicKey(),"default_image",message.getMessage(),message.getTimestamp(),"false");
+                Conversation conversation1 = new Conversation(message.getName(),message.getFromPublicKey(),"default_image",message.getMessage(),message.getTimestamp(),"false");
                 addConversation(conversation1);
             }
             else{
                 Log.d(TAG, "addMessage: conversation not null");
-                contentValues.put(MessageEntry.COLUMN_NAME,"none");
+                contentValues.put(MessageEntry.COLUMN_NAME,message.getName());
             }
-
-
-        }
-        else{
-            contentValues.put(MessageEntry.COLUMN_NAME,"none");
-        }
 
 
 

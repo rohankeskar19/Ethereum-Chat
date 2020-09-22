@@ -139,14 +139,15 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
 
 
     @ReactMethod
-    public void postMessage(String message,String publicKey){
+    public void postMessage(String name,String message,String publicKey){
         try{
             SharedPreferences sharedPreferences = getCurrentActivity().getPreferences(android.content.Context.MODE_PRIVATE);
 
             String selfPublicKey = sharedPreferences.getString("public_key","nodata");
-
+            String selfName = sharedPreferences.getString("name","nodata");
             JSONObject messageBody = new JSONObject();
             messageBody.put("app","EthereumChat");
+            messageBody.put("name",selfName);
             messageBody.put("time_stamp",System.currentTimeMillis());
             messageBody.put("text",message);
             messageBody.put("is_image","false");
@@ -159,7 +160,7 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
             Log.d(TAG, "postMessage: " + cmd);
             new WhisperAsyncRequestHandler(null,null,null).execute(request,null,null);
 
-            Message msg = new Message(String.valueOf(System.currentTimeMillis()),message,"false",selfPublicKey,publicKey);
+            Message msg = new Message(name,String.valueOf(System.currentTimeMillis()),message,"false",selfPublicKey,publicKey);
             ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
             chatDBHelper.addMessage(msg,selfPublicKey);
             chatDBHelper.updateConversation(publicKey,message,String.valueOf(System.currentTimeMillis()),"true");
@@ -196,6 +197,19 @@ public class EthereumChatMessagingModule extends ReactContextBaseJavaModule  {
       }
     }
 
+    @ReactMethod
+    public void markAsRead(String publicKey){
+        try{
+
+            Log.d(TAG, "markAsRead: Called");
+            ChatDBHelper chatDBHelper = new ChatDBHelper(getReactApplicationContext());
+
+            chatDBHelper.setConversationOpened(publicKey,"true");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
 }

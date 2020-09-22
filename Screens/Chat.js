@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { View } from "react-native";
-import { Text, FlatList, StyleSheet, NativeModules, DeviceEventEmitter } from "react-native";
+import { Text, FlatList, StyleSheet, NativeModules, DeviceEventEmitter, Image } from "react-native";
 import InputBar from "../components/InputBar";
 import MessageBubble from "../components/MessageBubble";
 
@@ -22,8 +22,8 @@ export default class Chat extends Component {
 
   componentDidMount() {
     DeviceEventEmitter.addListener('newMessage', this.onNewMessage);
-
     const contact = this.props.navigation.getParam("contact", "null");
+    EthereumChatMessagingModule.markAsRead(contact.public_key)
     this.setState({
       contact
     },() => {
@@ -39,7 +39,7 @@ export default class Chat extends Component {
 
     })
     this.refs.FlatList.scrollToEnd({ animated: true });
-
+    
 
   }
 
@@ -52,7 +52,7 @@ export default class Chat extends Component {
 
     const { contact } = this.state;
 
-    EthereumChatMessagingModule.postMessage(message.text, contact.public_key)
+    EthereumChatMessagingModule.postMessage(contact.name, message.text, contact.public_key)
 
     this.setState({
       messages: [...this.state.messages, message],
@@ -85,12 +85,29 @@ export default class Chat extends Component {
   };
 
   render() {
-    const { messages } = this.state;
+    const { messages,contact } = this.state;
    
     return (
       <View style={styles.outer}>
         <View style={styles.Header}>
-          <Text style={{ color: "white" }}>Photo & Name</Text>
+          <View style={styles.imgCol}>
+            {contact.profile_in_string == "default_image" ? (
+              <Image
+                source={require("../assets/default_profile.jpg")}
+                style={styles.ContactImage}
+              />
+            ) : (
+              <Image
+                source={{
+                  uri: `data:image/gif;base64,${contact.profile_in_string}`,
+                }}
+                style={styles.ContactImage}
+              />
+            )}
+          </View>
+          <View style={styles.msgCol}>
+            <Text style={styles.ContactName}>{contact.name}</Text>
+          </View>
         </View>
       
        <FlatList
@@ -136,5 +153,23 @@ const styles = StyleSheet.create({
   },
   messages: {
     flex: 1,
+  },
+  imgCol:{
+    flex:1,
+    justifyContent:"flex-start",
+  },
+  ContactImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 100,
+  },
+  ContactName: {
+    color: "#fff",
+    marginLeft: 0,
+    fontSize: 20,
+  },
+  msgCol:{
+    flex:5,
+    justifyContent:"flex-end",
   },
 });

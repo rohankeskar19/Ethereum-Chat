@@ -19,7 +19,7 @@ public class WhisperHelper {
     private static final int MASK_SECOND_TUPLE = 0x0F;
     private static final int SHIFT_FIRST_TUPLE = 4;
 
-    public static final String ip = "13.127.215.209";
+    public static final String ip = "10.0.2.2";
     public static final String rpcPort = "8545";
     public static final String wsPort = "8546";
 

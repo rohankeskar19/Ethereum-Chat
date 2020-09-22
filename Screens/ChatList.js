@@ -64,7 +64,6 @@ export class ChatList extends Component {
     if (item) {
       contact = item.contact.item;
     }
-
     return (
       <TouchableOpacity
         style={styles.ContactItem}

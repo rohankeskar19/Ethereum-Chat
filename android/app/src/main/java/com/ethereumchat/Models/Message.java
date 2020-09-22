@@ -4,18 +4,28 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
 
+    String name;
     String timestamp;
     String message;
     String isImage;
     String fromPublicKey;
     String toPublicKey;
 
-    public Message(String timestamp, String message, String isImage, String fromPublicKey, String toPublicKey) {
+    public Message(String name, String timestamp, String message, String isImage, String fromPublicKey, String toPublicKey) {
+        this.name = name;
         this.timestamp = timestamp;
         this.message = message;
         this.isImage = isImage;
         this.fromPublicKey = fromPublicKey;
         this.toPublicKey = toPublicKey;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getTimestamp() {
